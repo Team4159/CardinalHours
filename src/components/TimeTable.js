@@ -5,12 +5,6 @@ export default class TimeTable extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            signed_in: Array(100).fill(undefined).map(_ => Object.assign({}, {
-                name: 'Robotics Member',
-                time_in: 0
-            }))
-        };
     }
 
     componentDidMount() {
@@ -19,7 +13,7 @@ export default class TimeTable extends Component {
 
     tick() {
         this.setState({
-            signed_in: this.state.signed_in.map(user => Object.assign(user, {
+            signed_in: this.props.signed_in.map(user => Object.assign(user, {
                 time_in: user.time_in + 1
             }))
         })
@@ -42,7 +36,7 @@ export default class TimeTable extends Component {
                 </thead>
                 <tbody>
                     {
-                        this.state.signed_in.map((user, idx) => (
+                        this.props.signed_in.map((user, idx) => (
                             <tr key={ idx }>
                                 <td>{ user.name }</td>
                                 <td>{ TimeTable.formatTime(user.time_in) }</td>

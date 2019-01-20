@@ -14,7 +14,6 @@ export default class UserDisplay extends Component {
         this.onSubmit = this.onSubmit.bind(this)
     }
 
-
     handleChange(event) {
         this.setState({
             [event.target.name]: event.target.value
@@ -22,7 +21,7 @@ export default class UserDisplay extends Component {
     }
 
     onSubmit() {
-
+        this.props.addMember(this.state.name);
     }
 
     render() {
