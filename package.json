@@ -19,7 +19,8 @@
     "electron": "^4.0.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
-    "reactstrap": "^7.1.0"
+    "reactstrap": "^7.1.0",
+    "sqlite": "^3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",

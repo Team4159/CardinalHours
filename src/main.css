@@ -1,0 +1,35 @@
+body, html, .container {
+    height: 100%;
+}
+
+.header-fixed {
+    width: 100%
+}
+
+.TimeTable > thead,
+.TimeTable > tbody,
+.TimeTable > thead > tr,
+.TimeTable > tbody > tr,
+.TimeTable > thead > tr > th,
+.TimeTable > tbody > tr > td {
+    display: block;
+}
+
+.TimeTable > tbody > tr:after,
+.TimeTable > thead > tr:after {
+    content: ' ';
+    display: block;
+    visibility: hidden;
+    clear: both;
+}
+
+.TimeTable > tbody {
+    overflow-y: auto;
+    height: 80vh;
+}
+
+.TimeTable > tbody > tr > td,
+.TimeTable > thead > tr > th {
+    width: 50%;
+    float: left;
+}
