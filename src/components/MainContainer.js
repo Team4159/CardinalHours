@@ -3,6 +3,7 @@ import { Container, Row, Col } from 'reactstrap';
 
 import TimeTable from './TimeTable';
 import UserDisplay from './UserDisplay';
+import Jumbotron from "reactstrap/es/Jumbotron";
 
 export default class MainContainer extends Component {
     constructor(props){
@@ -22,6 +23,10 @@ export default class MainContainer extends Component {
                     signed_in: false
                 }],
             sign_in: '',
+            lastSigned: {
+                name: "Brandon Lou",
+                time_in: 4159
+            }
         });
 
         this.addMember = this.addMember.bind(this);
@@ -44,7 +49,13 @@ export default class MainContainer extends Component {
             if (arr.length > 0){
                 let newMembers = this.state.members;
                 newMembers[arr[0]].signed_in = !newMembers[arr[0]].signed_in;
-                this.setState({members: newMembers})
+                this.setState({
+                    members: newMembers,
+                    lastSigned: {
+                        name: this.state.members[arr[0]].name,
+                        time_in: TimeTable.formatTime(this.state.members[arr[0]].time_in)
+                    }
+                })
             }
 
             this.setState({sign_in: ''});
@@ -58,14 +69,23 @@ export default class MainContainer extends Component {
 
     componentDidMount(){document.addEventListener("keypress", this.handleKeyPress, false);}
     componentWillUnmount(){document.removeEventListener("keypress", this.handleKeyPress, false);}
-
+//
     render() {
         return (
             <Container>
               <h1>CardinalHours</h1>
               <Row>
                 <Col>
-                    <UserDisplay addMember={this.addMember}/>
+                    <Row>
+                        <UserDisplay addMember={this.addMember}/>
+                    </Row>
+                    <Row>
+                        <Jumbotron fluid>
+                            <p className="lead">{this.state.lastSigned.name}</p>
+                            <hr className="my-2" />
+                            <p>{this.state.lastSigned.time_in}</p>
+                        </Jumbotron>
+                    </Row>
                 </Col>
                 <Col>
                     <TimeTable members={this.state.members}/>
