@@ -47,7 +47,7 @@ export default class TimeTable extends Component {
 
         setInterval(this.tick.bind(this), 1000);
 
-        this.UserStore.onAddUser(user => {
+        this.UserStore.onAddUser(() => {
             this.setState({
                 hidden_id: ''
             });

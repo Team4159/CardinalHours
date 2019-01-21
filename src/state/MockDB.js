@@ -20,11 +20,11 @@ export default class MockDB {
     }
 
     addTime(user, time) {
+        user = Object.assign({}, user);
+
         delete user.time_in;
 
         this.query(user).total_time += time;
-
-        console.log(this.users);
     }
 
     query(query) {
