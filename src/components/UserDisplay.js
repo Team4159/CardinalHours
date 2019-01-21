@@ -17,8 +17,6 @@ export default class UserDisplay extends Component {
         this.onSubmit = this.onSubmit.bind(this);
     }
 
-
-
     handleChange(event) {
         this.setState({
             [event.target.name]: event.target.value
@@ -31,8 +29,9 @@ export default class UserDisplay extends Component {
             id: this.state.id
         };
 
-        this.UserStore.addUser(user);
-        this.UserStore.signInUser(user);
+        if (this.UserStore.addUser(user)) {
+            this.UserStore.signInUser(user);
+        }
 
         this.setState({
             name: '',

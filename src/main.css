@@ -6,6 +6,18 @@ body, html, .container {
     width: 100%
 }
 
+.jumbotron {
+    width: 100%;
+}
+
+.row {
+    height: 50%;
+}
+
+/*
+overflow stuff
+*/
+
 .TimeTable > thead,
 .TimeTable > tbody,
 .TimeTable > thead > tr,
@@ -32,8 +44,4 @@ body, html, .container {
 .TimeTable > thead > tr > th {
     width: 50%;
     float: left;
-}
-
-.jumbotron {
-    width: 100%;
 }

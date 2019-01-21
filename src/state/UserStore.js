@@ -1,12 +1,23 @@
 import MicroEmitter from 'micro-emitter';
 
+import MockDB from './MockDB';
+
 export default class SchoolStore {
     constructor() {
         this.eventEmitter = new MicroEmitter();
+        this.DB = new MockDB();
     }
 
     addUser(user) {
-        this.eventEmitter.emit('addUser', user);
+        user = Object.assign({}, user);
+
+        const res = this.DB.addUser(user);
+
+        if (res) {
+            this.eventEmitter.emit('addUser', user);
+        }
+
+        return res;
     }
 
     onAddUser(handler) {
@@ -14,6 +25,8 @@ export default class SchoolStore {
     }
 
     signInUser(user) {
+        user = Object.assign({}, user);
+
         this.eventEmitter.emit('signInUser', user);
     }
 
@@ -22,6 +35,10 @@ export default class SchoolStore {
     }
 
     signOutUser(user) {
+        user = Object.assign({}, user);
+
+        this.DB.addTime(user, user.time_in);
+
         this.eventEmitter.emit('signOutUser', user);
     }
 

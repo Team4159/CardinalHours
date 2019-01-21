@@ -28,7 +28,7 @@ export default class TimeTable extends Component {
                 if (index === -1) {
                     this.UserStore.signInUser(match);
                 } else {
-                    this.UserStore.signOutUser(match);
+                    this.UserStore.signOutUser(this.state.signed_in[index]);
                 }
             }
 
@@ -47,7 +47,7 @@ export default class TimeTable extends Component {
 
         setInterval(this.tick.bind(this), 1000);
 
-        this.UserStore.onAddUser(() => {
+        this.UserStore.onAddUser(user => {
             this.setState({
                 hidden_id: ''
             });
@@ -74,7 +74,7 @@ export default class TimeTable extends Component {
         });
 
         this.UserStore.signInUser(this.DB.query({
-            name: 'Brandon Lou'
+            id: '.'
         }));
     }
 

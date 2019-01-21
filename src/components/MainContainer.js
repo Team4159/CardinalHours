@@ -6,24 +6,13 @@ import UserDisplay from './UserDisplay';
 import LastActionDisplay from './LastActionDisplay';
 
 import UserStore from '../state/UserStore';
-import MockDB from '../state/MockDB';
 
 export default class MainContainer extends Component {
     constructor(props) {
         super(props);
 
         this.UserStore = new UserStore();
-        this.DB = new MockDB();
-    }
-
-    componentDidMount() {
-        this.UserStore.onAddUser(user => {
-            this.DB.addUser(user);
-        });
-
-        this.UserStore.onSignOutUser(user => {
-            this.DB.addTime(user, user.time_in);
-        });
+        this.DB = this.UserStore.DB;
     }
 
     render() {
