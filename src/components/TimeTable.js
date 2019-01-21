@@ -50,19 +50,15 @@ export default class TimeTable extends Component {
 
         setInterval(this.tick.bind(this), 1000);
 
-        this.UserStore.onAddUser(() => {
-            this.setState({
-                hidden_id: ''
-            });
-        });
+        this.UserStore.onAddUser(() => this.setState({
+            hidden_id: ''
+        }));
 
-        this.UserStore.onSignInUser(user => {
-            this.setState({
-                signed_in: this.state.signed_in.concat([Object.assign(user, {
-                    time_in: 0
-                })])
-            });
-        });
+        this.UserStore.onSignInUser(user => this.setState({
+            signed_in: this.state.signed_in.concat([Object.assign(user, {
+                time_in: 0
+            })])
+        }));
 
         this.UserStore.onSignOutUser(user => {
             const index = this.state.signed_in.findIndex(user_ => user_.id === user.id);
@@ -98,7 +94,9 @@ export default class TimeTable extends Component {
 
         const seconds = time;
 
-        return `${ days > 0 ? days + ':' : '' }${ hours.toString().length === 1 ? '0' + hours : hours  }:${ minutes.toString().length === 1 ? '0' + minutes : minutes }:${ seconds.toString().length === 1 ? '0' + seconds : seconds }`;
+        const pad = number => number.toString().length === 1 ? '0' + number : number;
+
+        return `${ days > 0 ? days + ':' : '' }${ pad(hours)  }:${ pad(minutes) }:${ pad(seconds) }`;
     }
 
     render() {

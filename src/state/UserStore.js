@@ -6,6 +6,8 @@ class UserStore {
     constructor() {
         this.eventEmitter = new MicroEmitter();
         this.DB = MockDB.getInstance();
+
+        this.onSignOutUser(user => this.DB.addTime(user, user.time_in));
     }
 
     addUser(user) {
@@ -36,8 +38,6 @@ class UserStore {
 
     signOutUser(user) {
         user = Object.assign({}, user);
-
-        this.DB.addTime(user, user.time_in);
 
         this.eventEmitter.emit('signOutUser', user);
     }
