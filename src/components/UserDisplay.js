@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Container, Button, Input } from 'reactstrap';
 
 import UserStore from '../state/UserStore';
-import DB from '../state/MockDB';
+import DB from '../state/DB';
 
 export default class UserDisplay extends Component {
     constructor(props) {
@@ -60,7 +60,7 @@ export default class UserDisplay extends Component {
                 <Button
                     color='light'
                     onClick={ this.onSubmit }
-                >Add User</Button>
+                >Add New User</Button>
             </Container>
         );
     }

@@ -1,20 +1,35 @@
-class MockDB {
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+
+class DB {
     constructor() {
-        this.users = [{
-            name: 'Brandon Lou',
-            id: '.',
-            total_time: 0
-        }];
+        this.filename = path.join(os.homedir(), 'users.json');
+
+        if (fs.existsSync(this.filename)) {
+            this.users = JSON.parse(fs.readFileSync(this.filename));
+        } else {
+            fs.writeFileSync(this.filename, JSON.stringify([]));
+            this.users = [];
+        }
+    }
+
+    updateFile() {
+        fs.writeFileSync(this.filename, JSON.stringify(this.users));
     }
 
     addUser(user) {
         if (this.query(user)) return false;
+
+        console.log(this.users);
 
         this.users.push({
             name: user.name,
             id: user.id,
             total_time: 0
         });
+
+        this.updateFile();
 
         return true;
     }
@@ -25,6 +40,8 @@ class MockDB {
         delete user.time_in;
 
         this.query(user).total_time += time;
+
+        this.updateFile();
     }
 
     query(query) {
@@ -38,7 +55,7 @@ let instance;
 
 export default {
     getInstance() {
-        if (instance === undefined) instance = new MockDB();
+        if (instance === undefined) instance = new DB();
         return instance;
     }
 }

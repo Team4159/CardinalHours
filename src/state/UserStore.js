@@ -1,6 +1,6 @@
 import MicroEmitter from 'micro-emitter';
 
-import MockDB from './MockDB';
+import MockDB from './DB';
 
 class UserStore {
     constructor() {

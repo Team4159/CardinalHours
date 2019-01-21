@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Table } from 'reactstrap';
 
 import UserStore from '../state/UserStore';
-import DB from '../state/MockDB';
+import DB from '../state/DB';
 
 export default class TimeTable extends Component {
     constructor(props) {
@@ -75,10 +75,6 @@ export default class TimeTable extends Component {
                 signed_in: newUsers
             });
         });
-
-        this.UserStore.signInUser(this.DB.query({
-            id: '.'
-        }));
     }
 
     tick() {

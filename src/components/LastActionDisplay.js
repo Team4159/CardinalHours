@@ -4,7 +4,7 @@ import { Jumbotron } from 'reactstrap';
 import TimeTable from './TimeTable';
 
 import UserStore from '../state/UserStore';
-import DB from '../state/MockDB';
+import DB from '../state/DB';
 
 export default class LastActionDisplay extends Component {
     constructor(props) {
