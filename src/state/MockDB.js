@@ -1,4 +1,4 @@
-export default class MockDB {
+class MockDB {
     constructor() {
         this.users = [{
             name: 'Brandon Lou',
@@ -29,8 +29,16 @@ export default class MockDB {
 
     query(query) {
         return this.users.find(user => Object.keys(query)
-            .map(key => query[key] === user[key])
-            .every( _ => _)
+            .every(key => query[key] === user[key])
         );
+    }
+}
+
+let instance;
+
+export default {
+    getInstance() {
+        if (instance === undefined) instance = new MockDB();
+        return instance;
     }
 }

@@ -2,10 +2,10 @@ import MicroEmitter from 'micro-emitter';
 
 import MockDB from './MockDB';
 
-export default class SchoolStore {
+class UserStore {
     constructor() {
         this.eventEmitter = new MicroEmitter();
-        this.DB = new MockDB();
+        this.DB = MockDB.getInstance();
     }
 
     addUser(user) {
@@ -44,5 +44,14 @@ export default class SchoolStore {
 
     onSignOutUser(handler) {
         this.eventEmitter.on('signOutUser', handler);
+    }
+}
+
+let instance;
+
+export default {
+    getInstance() {
+        if (instance === undefined) instance = new UserStore();
+        return instance;
     }
 }

@@ -5,14 +5,9 @@ import TimeTable from './TimeTable';
 import UserDisplay from './UserDisplay';
 import LastActionDisplay from './LastActionDisplay';
 
-import UserStore from '../state/UserStore';
-
 export default class MainContainer extends Component {
     constructor(props) {
         super(props);
-
-        this.UserStore = new UserStore();
-        this.DB = this.UserStore.DB;
     }
 
     render() {
@@ -21,24 +16,15 @@ export default class MainContainer extends Component {
                 <h1>CardinalHours</h1>
                 <Row>
                     <Col>
-                        <Row>
-                            <UserDisplay
-                                UserStore={ this.UserStore }
-                                DB = { this.DB }
-                            />
+                        <Row style={ { height: '25%' } }>
+                            <UserDisplay/>
                         </Row>
-                        <Row>
-                            <LastActionDisplay
-                                UserStore={ this.UserStore }
-                                DB = { this.DB }
-                            />
+                        <Row style={ { height: '75%' } }>
+                            <LastActionDisplay/>
                         </Row>
                     </Col>
                     <Col>
-                        <TimeTable
-                            UserStore={ this.UserStore }
-                            DB = { this.DB }
-                        />
+                        <TimeTable/>
                     </Col>
                 </Row>
             </Container>
