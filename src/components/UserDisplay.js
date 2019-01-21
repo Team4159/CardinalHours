@@ -5,6 +5,9 @@ export default class UserDisplay extends Component {
     constructor(props) {
         super(props);
 
+        this.UserStore = this.props.UserStore;
+        this.DB = this.props.DB;
+
         this.state = {
             name: '',
             id: '',
@@ -23,7 +26,18 @@ export default class UserDisplay extends Component {
     }
 
     onSubmit() {
-        this.props.addMember(this.state.name, this.state.id);
+        const user = {
+            name: this.state.name,
+            id: this.state.id
+        };
+
+        this.UserStore.addUser(user);
+        this.UserStore.signInUser(user);
+
+        this.setState({
+            name: '',
+            id: ''
+        });
     }
 
     render() {

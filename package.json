@@ -17,10 +17,10 @@
   "dependencies": {
     "bootstrap": "^4.2.1",
     "electron": "^4.0.0",
+    "micro-emitter": "^1.1.15",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
-    "reactstrap": "^7.1.0",
-    "sqlite": "^3.0.0"
+    "reactstrap": "^7.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
