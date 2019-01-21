@@ -90,10 +90,19 @@ export default class TimeTable extends Component {
         });
     }
 
-    static formatTime(seconds) {
-        const date = new Date(null);
-        date.setSeconds(seconds);
-        return date.toISOString().substr(11, 8);
+    static formatTime(time) {
+        const days = Math.floor(time / (60 * 60 * 24));
+        time -= days * (60 * 60 * 24);
+
+        const hours = Math.floor(time / (60 * 60));
+        time -= hours * (60 * 60);
+
+        const minutes = Math.floor(time / 60);
+        time -= minutes * 60;
+
+        const seconds = time;
+
+        return `${ days > 0 ? days + ':' : '' }${ hours.toString().length === 1 ? '0' + hours : hours  }:${ minutes.toString().length === 1 ? '0' + minutes : minutes }:${ seconds.toString().length === 1 ? '0' + seconds : seconds }`;
     }
 
     render() {
