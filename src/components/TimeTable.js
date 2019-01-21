@@ -13,9 +13,10 @@ export default class TimeTable extends Component {
 
     tick() {
         this.setState({
-            signed_in: this.props.signed_in.map(user => Object.assign(user, {
+            members: this.props.members.map(user =>
+                user.signed_in ? Object.assign(user, {
                 time_in: user.time_in + 1
-            }))
+            }): null)
         })
     }
 
@@ -36,11 +37,11 @@ export default class TimeTable extends Component {
                 </thead>
                 <tbody>
                     {
-                        this.props.signed_in.map((user, idx) => (
-                            <tr key={ idx }>
+                        this.props.members.map((user, idx) => (
+                            user.signed_in ? <tr key={ idx }>
                                 <td>{ user.name }</td>
                                 <td>{ TimeTable.formatTime(user.time_in) }</td>
-                            </tr>
+                            </tr> : null
                         ))
                     }
                 </tbody>
