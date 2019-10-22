@@ -2,14 +2,12 @@ import React, { Component } from 'react';
 import { Container, Button, Input } from 'reactstrap';
 
 import UserStore from '../state/UserStore';
-import DB from '../state/DB';
 
 export default class UserDisplay extends Component {
     constructor(props) {
         super(props);
 
         this.UserStore = UserStore.getInstance();
-        this.DB = DB.getInstance();
 
         this.state = {
             name: '',

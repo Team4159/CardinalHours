@@ -6,17 +6,13 @@ class UserStore {
     constructor() {
         this.eventEmitter = new MicroEmitter();
         this.DB = MockDB.getInstance();
-
-        this.onSignOutUser(user => this.DB.addTime(user, user.time_in));
     }
 
     addUser(user) {
-        user = Object.assign({}, user);
-
         const res = this.DB.addUser(user);
 
         if (res) {
-            this.eventEmitter.emit('addUser', user);
+            this.eventEmitter.emit('addUser', this.DB.query(user));
         }
 
         return res;
@@ -27,9 +23,7 @@ class UserStore {
     }
 
     signInUser(user) {
-        user = Object.assign({}, user);
-
-        this.eventEmitter.emit('signInUser', user);
+        this.eventEmitter.emit('signInUser', this.DB.query(user));
     }
 
     onSignInUser(handler) {
@@ -37,9 +31,7 @@ class UserStore {
     }
 
     signOutUser(user) {
-        user = Object.assign({}, user);
-
-        this.eventEmitter.emit('signOutUser', user);
+        this.eventEmitter.emit('signOutUser', this.DB.query(user));
     }
 
     onSignOutUser(handler) {

@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import moment from 'moment';
 
 class DB {
     constructor() {
@@ -21,12 +22,10 @@ class DB {
     addUser(user) {
         if (this.query(user)) return false;
 
-        console.log(this.users);
-
         this.users.push({
             name: user.name,
             id: user.id,
-            total_time: 0
+            sessions: []
         });
 
         this.updateFile();
@@ -34,14 +33,13 @@ class DB {
         return true;
     }
 
-    addTime(user, time) {
-        user = Object.assign({}, user);
-
-        delete user.time_in;
-
-        this.query(user).total_time += time;
-
+    addSession(user, session) {
+        this.query(user).sessions.push(session);
         this.updateFile();
+    }
+
+    getTotalTime(user) {
+        return this.query(user).sessions.reduce((acc, cur) => acc + moment(cur.end).diff(moment(cur.start)), 0);
     }
 
     query(query) {

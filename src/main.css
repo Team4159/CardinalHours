@@ -41,3 +41,7 @@ overflow stuff
     width: 50%;
     float: left;
 }
+
+input {
+    margin-bottom: 5px !important;
+}

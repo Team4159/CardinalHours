@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Jumbotron } from 'reactstrap';
 
-import TimeTable from './TimeTable';
+import moment from 'moment';
 
+import TimeTable from './TimeTable';
 import UserStore from '../state/UserStore';
 import DB from '../state/DB';
 
@@ -26,20 +27,14 @@ export default class LastActionDisplay extends Component {
             name: user.name,
             action: 'IN',
             session_time: 'N/A',
-            total_time: this.DB.query({
-                name: user.name,
-                id: user.id
-            }).total_time
+            total_time: this.DB.getTotalTime(user)
         }));
 
         this.UserStore.onSignOutUser(user => this.setState({
             name: user.name,
             action: 'OUT',
-            session_time: user.time_in,
-            total_time: this.DB.query({
-                name: user.name,
-                id: user.id
-            }).total_time
+            session_time: moment(user.sessions[user.sessions.length - 1].end).diff(user.sessions[user.sessions.length - 1].start),
+            total_time: this.DB.getTotalTime(user)
         }));
     }
 

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Table } from 'reactstrap';
 
+import moment from 'moment';
+
 import UserStore from '../state/UserStore';
 import DB from '../state/DB';
 
@@ -12,7 +14,8 @@ export default class TimeTable extends Component {
         this.DB = DB.getInstance();
 
         this.state = {
-            signed_in: [],
+            sessions: [],
+            current_time: moment(),
             hidden_id: ''
         };
 
@@ -26,12 +29,15 @@ export default class TimeTable extends Component {
             });
 
             if (match) {
-                const index = this.state.signed_in.findIndex(user => user.id === match.id);
+                const index = this.state.sessions.findIndex(session => session.user.id === match.id);
 
                 if (index === -1) {
                     this.UserStore.signInUser(match);
                 } else {
-                    this.UserStore.signOutUser(this.state.signed_in[index]);
+                    const session = this.state.sessions[index];
+                    session.session.end = moment().toISOString();
+                    this.DB.addSession(session.user, session.session);
+                    this.UserStore.signOutUser(session.user);
                 }
             }
 
@@ -55,48 +61,35 @@ export default class TimeTable extends Component {
         }));
 
         this.UserStore.onSignInUser(user => this.setState({
-            signed_in: this.state.signed_in.concat([Object.assign(user, {
-                time_in: 0
-            })])
+            sessions: this.state.sessions.concat([{
+                user,
+                session: {
+                    start: moment().toISOString()
+                }
+            }])
         }));
 
         this.UserStore.onSignOutUser(user => {
-            const index = this.state.signed_in.findIndex(user_ => user_.id === user.id);
+            const index = this.state.sessions.findIndex(session => session.user.id === user.id);
 
-            const newUsers = this.state.signed_in.slice();
+            const newUsers = this.state.sessions.slice();
 
             newUsers.splice(index, 1);
 
             this.setState({
-                signed_in: newUsers
+                sessions: newUsers
             });
         });
     }
 
-    tick() {
-        this.setState({
-            members: this.state.signed_in.map(user =>
-                Object.assign(user, {
-                time_in: user.time_in + 1
-            }))
-        });
+    static formatTime(time) {
+        return moment.utc(time).format('HH:mm:ss');
     }
 
-    static formatTime(time) {
-        const days = Math.floor(time / (60 * 60 * 24));
-        time -= days * (60 * 60 * 24);
-
-        const hours = Math.floor(time / (60 * 60));
-        time -= hours * (60 * 60);
-
-        const minutes = Math.floor(time / 60);
-        time -= minutes * 60;
-
-        const seconds = time;
-
-        const pad = number => number.toString().length === 1 ? '0' + number : number;
-
-        return `${ days > 0 ? days + ':' : '' }${ pad(hours)  }:${ pad(minutes) }:${ pad(seconds) }`;
+    tick() {
+        this.setState({
+            current_time: moment()
+        });
     }
 
     render() {
@@ -110,10 +103,10 @@ export default class TimeTable extends Component {
                 </thead>
                 <tbody>
                     {
-                        this.state.signed_in.map((user, idx) => (
+                        this.state.sessions.map((session, idx) => (
                             <tr key={ idx }>
-                                <td>{ user.name }</td>
-                                <td>{ TimeTable.formatTime(user.time_in) }</td>
+                                <td>{ session.user.name }</td>
+                                <td>{ TimeTable.formatTime(this.state.current_time.diff(moment(session.session.start))) }</td>
                             </tr>
                         ))
                     }
