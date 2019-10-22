@@ -6,6 +6,7 @@ import moment from 'moment';
 class DB {
     constructor() {
         this.filename = path.join(os.homedir(), 'users.json');
+        this.fsWait = false;
 
         if (fs.existsSync(this.filename)) {
             this.users = JSON.parse(fs.readFileSync(this.filename));
@@ -13,6 +14,16 @@ class DB {
             fs.writeFileSync(this.filename, JSON.stringify([]));
             this.users = [];
         }
+
+        fs.watch(this.filename, (event, filename) => {
+            if (filename) {
+                if (this.fsWait) return;
+                this.fsWait = setTimeout(() => {
+                    this.fsWait = false;
+                }, 100);
+                this.users = JSON.parse(fs.readFileSync(this.filename));
+            }
+        });
     }
 
     updateFile() {
@@ -20,7 +31,7 @@ class DB {
     }
 
     addUser(user) {
-        if (this.query(user)) return false;
+        if (this.query({id: user.id})) return false;
 
         this.users.push({
             name: user.name,

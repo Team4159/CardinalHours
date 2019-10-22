@@ -24,7 +24,9 @@ export default class UserDisplay extends Component {
         });
     }
 
-    onSubmit() {
+    onSubmit(e) {
+        e.preventDefault();
+
         const user = {
             name: this.state.name,
             id: this.state.id
@@ -32,6 +34,8 @@ export default class UserDisplay extends Component {
 
         if (this.UserStore.addUser(user)) {
             this.UserStore.signInUser(user);
+        } else {
+            alert('Student ID Already Taken!');
         }
 
         this.setState({
@@ -43,22 +47,24 @@ export default class UserDisplay extends Component {
     render() {
         return (
             <Container className='UserDisplay'>
-                <Input
-                    name='name'
-                    placeholder='Name'
-                    value={ this.state.name }
-                    onChange={ this.handleChange }
-                />
-                <Input
-                    name='id'
-                    placeholder='Student ID'
-                    value={ this.state.id }
-                    onChange={ this.handleChange }
-                />
-                <Button
-                    color='light'
-                    onClick={ this.onSubmit }
-                >Add New User</Button>
+                <form onSubmit={ this.onSubmit }>
+                    <Input
+                        name='name'
+                        placeholder='Name'
+                        value={ this.state.name }
+                        onChange={ this.handleChange }
+                    />
+                    <Input
+                        name='id'
+                        placeholder='Student ID'
+                        value={ this.state.id }
+                        onChange={ this.handleChange }
+                    />
+                    <Button
+                        color='light'
+                        onClick={ this.onSubmit }
+                    >Add New User</Button>
+                </form>
             </Container>
         );
     }
