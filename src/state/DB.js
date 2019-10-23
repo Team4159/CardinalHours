@@ -10,6 +10,7 @@ class DB {
         this.fsWait = false;
 
         // https://docs.google.com/spreadsheets/d/1N06gqxOtbdiD12g7-4PyYCE0RdWl6vOx2J1CkGexR3A/edit?usp=sharing
+        // writer@quickstart-1553556916205.iam.gserviceaccount.com
         this.sheet = new GoogleSpreadsheet('1N06gqxOtbdiD12g7-4PyYCE0RdWl6vOx2J1CkGexR3A');
         this.creds = require('./client_secret');
 
@@ -44,13 +45,13 @@ class DB {
         this.sheet.useServiceAccountAuth(this.creds, err => {
             this.sheet.getRows(1, (err, rows) => {
                 for (let row of rows) {
-                    row.del();
+                    let user = this.query({name: row.name});
+                    if (user !== undefined) {
+                        row.hours = (this.getTotalTime(user) / 3600000).toFixed(2);
+                        row.save(console.error);
+                    }
                 }
             });
-
-            for (const user of this.users) {
-                this.sheet.addRow(1, {Name: user["name"], Hours: Math.floor(this.getTotalTime(user) / 3600000)})
-            }
         });
     }
 
