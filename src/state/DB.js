@@ -27,6 +27,11 @@ class DB {
     }
 
     updateFile() {
+        this.fsWait = true;
+        this.fsWait = setTimeout(() => {
+            this.fsWait = false;
+        }, 100);
+
         fs.writeFileSync(this.filename, JSON.stringify(this.users));
     }
 
@@ -45,7 +50,9 @@ class DB {
     }
 
     addSession(user, session) {
+        console.log(user, session);
         this.query(user).sessions.push(session);
+
         this.updateFile();
     }
 

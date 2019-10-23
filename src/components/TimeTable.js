@@ -118,7 +118,8 @@ export default class TimeTable extends Component {
                         this.state.sessions.map((session, idx) => (
                             <tr key={ idx }>
                                 <td>{ session.user.name }</td>
-                                <td>{ TimeTable.formatTime(this.state.current_time.diff(moment(session.session.start))) }</td>
+                                <td>{ TimeTable.formatTime(this.state.current_time.diff(moment(session.session.start)) > 0 ?
+                                                                 this.state.current_time.diff(moment(session.session.start)) : 0) }</td>
                             </tr>
                         ))
                     }
