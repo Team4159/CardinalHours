@@ -50,7 +50,6 @@ class DB {
     }
 
     addSession(user, session) {
-        console.log(user, session);
         this.query(user).sessions.push(session);
 
         this.updateFile();
