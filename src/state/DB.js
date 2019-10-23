@@ -66,11 +66,6 @@ class DB {
     }
 }
 
-let instance;
+let instance = new DB();
 
-export default {
-    getInstance() {
-        if (instance === undefined) instance = new DB();
-        return instance;
-    }
-}
+export default instance;

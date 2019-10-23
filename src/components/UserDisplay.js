@@ -7,8 +7,6 @@ export default class UserDisplay extends Component {
     constructor(props) {
         super(props);
 
-        this.UserStore = UserStore.getInstance();
-
         this.state = {
             name: '',
             id: '',
@@ -32,8 +30,8 @@ export default class UserDisplay extends Component {
             id: this.state.id
         };
 
-        if (this.UserStore.addUser(user)) {
-            this.UserStore.signInUser(user);
+        if (UserStore.addUser(user)) {
+            UserStore.signInUser(user);
         } else {
             alert('Student ID Already Taken!');
         }
@@ -63,6 +61,7 @@ export default class UserDisplay extends Component {
                     <Button
                         color='light'
                         onClick={ this.onSubmit }
+                        type='submit'
                     >Add New User</Button>
                 </form>
             </Container>

@@ -1,18 +1,17 @@
 import MicroEmitter from 'micro-emitter';
 
-import MockDB from './DB';
+import DB from './DB';
 
 class UserStore {
     constructor() {
         this.eventEmitter = new MicroEmitter();
-        this.DB = MockDB.getInstance();
     }
 
     addUser(user) {
-        const res = this.DB.addUser(user);
+        const res = DB.addUser(user);
 
         if (res) {
-            this.eventEmitter.emit('addUser', this.DB.query(user));
+            this.eventEmitter.emit('addUser', DB.query(user));
         }
 
         return res;
@@ -23,7 +22,7 @@ class UserStore {
     }
 
     signInUser(user) {
-        this.eventEmitter.emit('signInUser', this.DB.query(user));
+        this.eventEmitter.emit('signInUser', DB.query(user));
     }
 
     onSignInUser(handler) {
@@ -31,7 +30,7 @@ class UserStore {
     }
 
     signOutUser(user) {
-        this.eventEmitter.emit('signOutUser', this.DB.query(user));
+        this.eventEmitter.emit('signOutUser', DB.query(user));
     }
 
     onSignOutUser(handler) {
@@ -39,11 +38,6 @@ class UserStore {
     }
 }
 
-let instance;
+let instance = new UserStore();
 
-export default {
-    getInstance() {
-        if (instance === undefined) instance = new UserStore();
-        return instance;
-    }
-}
+export default instance;

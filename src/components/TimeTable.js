@@ -10,9 +10,6 @@ export default class TimeTable extends Component {
     constructor(props) {
         super(props);
 
-        this.UserStore = UserStore.getInstance();
-        this.DB = DB.getInstance();
-
         this.state = {
             sessions: [],
             current_time: moment(),
@@ -24,7 +21,7 @@ export default class TimeTable extends Component {
 
     handleKeyPress(event) {
         if (event.which === 13) {
-            const match = this.DB.query({
+            const match = DB.query({
                 id: this.state.hidden_id
             });
 
@@ -32,12 +29,12 @@ export default class TimeTable extends Component {
                 const index = this.state.sessions.findIndex(session => session.user.id === match.id);
 
                 if (index === -1) {
-                    this.UserStore.signInUser(match);
+                    UserStore.signInUser(match);
                 } else {
                     const session = this.state.sessions[index];
                     session.session.end = moment().toISOString();
-                    this.DB.addSession(session.user, session.session);
-                    this.UserStore.signOutUser(session.user);
+                    DB.addSession(session.user, session.session);
+                    UserStore.signOutUser(session.user);
                 }
             }
 
@@ -56,11 +53,11 @@ export default class TimeTable extends Component {
 
         setInterval(this.tick.bind(this), 1000);
 
-        this.UserStore.onAddUser(() => this.setState({
+        UserStore.onAddUser(() => this.setState({
             hidden_id: ''
         }));
 
-        this.UserStore.onSignInUser(user => this.setState({
+        UserStore.onSignInUser(user => this.setState({
             sessions: this.state.sessions.concat([{
                 user,
                 session: {
@@ -69,7 +66,7 @@ export default class TimeTable extends Component {
             }])
         }));
 
-        this.UserStore.onSignOutUser(user => {
+        UserStore.onSignOutUser(user => {
             const index = this.state.sessions.findIndex(session => session.user.id === user.id);
 
             const newUsers = this.state.sessions.slice();
