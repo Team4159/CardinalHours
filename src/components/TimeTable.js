@@ -83,7 +83,19 @@ export default class TimeTable extends Component {
     }
 
     static formatTime(time) {
-        return moment.utc(time).format('HH:mm:ss');
+        time = time / 1000;
+
+        const hours = Math.floor(time / (60 * 60));
+        time -= hours * (60 * 60);
+
+        const minutes = Math.floor(time / 60);
+        time -= minutes * 60;
+
+        const seconds = Math.round(time);
+
+        const pad = number => number.toString().length === 1 ? '0' + number : number;
+
+        return `${ pad(hours)  }:${ pad(minutes) }:${ pad(seconds) }`;
     }
 
     tick() {
