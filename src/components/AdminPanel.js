@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {Button} from 'reactstrap';
-import Container from "reactstrap/es/Container";
 import ReactModal from "react-modal";
 
 export default class AdminPanel extends Component {
@@ -10,6 +9,7 @@ export default class AdminPanel extends Component {
         this.state = {
             showModal: false,
         };
+
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
     }
@@ -21,15 +21,12 @@ export default class AdminPanel extends Component {
         this.setState({ showModal: false });
     }
 
-
-
-
     render() {
         return (
             <div>
-                <button onClick={this.handleOpenModal}>Admin Panel</button>
+                <Button onClick={ this.handleOpenModal }>Admin Panel</Button>
                 <ReactModal
-                    isOpen={this.state.showModal}
+                    isOpen={ this.state.showModal }
                     contentLabel="Admin Panel"
                     style = {{
                         content: {
@@ -39,13 +36,11 @@ export default class AdminPanel extends Component {
                         }
                     }}
                 >
-                    <Button className='memberTable'>
-                        View times/drop members
-                    </Button>
-                    <Button className='buildDate'>
-                        Change build season start and end date
-                    </Button>
-                    <button onClick={this.handleCloseModal}>Close</button>
+                    <Button>View times/drop members</Button>
+                    <br/>
+                    <Button>Change build season start and end date</Button>
+                    <br/>
+                    <Button onClick={ this.handleCloseModal }>Close</Button>
                 </ReactModal>
             </div>
         );

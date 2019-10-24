@@ -7,8 +7,6 @@ import TimeTable from './TimeTable';
 import UserStore from '../state/UserStore';
 import DB from '../state/DB';
 
-import config from '../state/config.json';
-
 export default class LastActionDisplay extends Component {
     constructor(props) {
         super(props);
@@ -23,13 +21,13 @@ export default class LastActionDisplay extends Component {
     }
 
     componentDidMount() {
-        const populateAdditionalFields = (user) => (Object.assign(
-            Object.keys(config.day_counters).reduce((acc, cur) => {
-                acc[cur] = DB.getTotalCertainDays(user, config.day_counters[cur]);
+        const populateAdditionalFields = user => (Object.assign(
+            Object.keys(DB.config.day_counters).reduce((acc, cur) => {
+                acc[cur] = DB.getTotalCertainDays(user, DB.config.day_counters[cur]);
                 return acc;
             }, {}),
-            Object.keys(config.hour_counters).reduce((acc, cur) => {
-                acc[cur] = TimeTable.formatTime(DB.getTotalTimeInRange(user, ...config.hour_counters[cur]));
+            Object.keys(DB.config.hour_counters).reduce((acc, cur) => {
+                acc[cur] = TimeTable.formatTime(DB.getTotalTimeInRange(user, ...DB.config.hour_counters[cur]));
                 return acc;
             }, {})
         ));

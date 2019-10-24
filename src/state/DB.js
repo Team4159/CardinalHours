@@ -1,20 +1,27 @@
 import fs from 'fs';
 import path from 'path';
-import os from 'os';
+
 import moment from 'moment';
 import GoogleSpreadsheet from 'google-spreadsheet';
-
-import config from '../state/config.json';
+import { remote } from 'electron';
 
 class DB {
     constructor() {
-        this.filename = path.join(os.homedir(), 'users.json');
+        this.filename = path.join(remote.getGlobal('dataPath'), 'users.json');
         this.fsWait = false;
 
         // https://docs.google.com/spreadsheets/d/1N06gqxOtbdiD12g7-4PyYCE0RdWl6vOx2J1CkGexR3A/edit?usp=sharing
         // writer@quickstart-1553556916205.iam.gserviceaccount.com
         this.sheet = new GoogleSpreadsheet('1N06gqxOtbdiD12g7-4PyYCE0RdWl6vOx2J1CkGexR3A');
         this.creds = require('./client_secret');
+
+        this.config_filename = path.join(remote.getGlobal('dataPath'), 'config.json');
+        if (fs.existsSync(this.config_filename)) {
+            this.config = JSON.parse(fs.readFileSync(this.config_filename));
+        } else {
+            fs.writeFileSync(this.config_filename, JSON.stringify(require('./default_config.json')));
+            this.config = require('./default_config.json');
+        }
 
         if (fs.existsSync(this.filename)) {
             this.users = JSON.parse(fs.readFileSync(this.filename));
@@ -44,12 +51,12 @@ class DB {
                 row.hours = formatTime(this.getTotalUserTime(user));
                 row.teamdays = this.getTotalUserDays(user);
 
-                for (let day_counter of Object.keys(config.day_counters)) {
-                    row[day_counter] = this.getTotalCertainDays(user, config.day_counters[day_counter]);
+                for (let day_counter of Object.keys(this.config.day_counters)) {
+                    row[day_counter] = this.getTotalCertainDays(user, this.config.day_counters[day_counter]);
                 }
 
-                for (let hour_counter of Object.keys(config.hour_counters)) {
-                    row[hour_counter] = formatTime(this.getTotalTimeInRange(user, config.hour_counters[hour_counter]));
+                for (let hour_counter of Object.keys(this.config.hour_counters)) {
+                    row[hour_counter] = formatTime(this.getTotalTimeInRange(user, this.config.hour_counters[hour_counter]));
                 }
 
                 row.save(err => err ? console.error(err) : null);
