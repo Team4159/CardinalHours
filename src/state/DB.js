@@ -2,11 +2,17 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import moment from 'moment';
+import GoogleSpreadsheet from 'google-spreadsheet';
 
 class DB {
     constructor() {
         this.filename = path.join(os.homedir(), 'users.json');
         this.fsWait = false;
+
+        // https://docs.google.com/spreadsheets/d/1N06gqxOtbdiD12g7-4PyYCE0RdWl6vOx2J1CkGexR3A/edit?usp=sharing
+        // writer@quickstart-1553556916205.iam.gserviceaccount.com
+        this.sheet = new GoogleSpreadsheet('1N06gqxOtbdiD12g7-4PyYCE0RdWl6vOx2J1CkGexR3A');
+        this.creds = require('./client_secret');
 
         if (fs.existsSync(this.filename)) {
             this.users = JSON.parse(fs.readFileSync(this.filename));
@@ -22,6 +28,20 @@ class DB {
 
     updateFile() {
         fs.writeFileSync(this.filename, JSON.stringify(this.users));
+    }
+
+    updateSheets() {
+        this.sheet.useServiceAccountAuth(this.creds, err => {
+            this.sheet.getRows(1, (err, rows) => {
+                for (let row of rows) {
+                    let user = this.query({name: row.name});
+                    if (user !== undefined) {
+                        row.hours = (this.getTotalTime(user) / 3600000).toFixed(2);
+                        row.save(console.error);
+                    }
+                }
+            });
+        });
     }
 
     addUser(user) {
@@ -41,6 +61,7 @@ class DB {
     addSession(user, session) {
         this.query(user).sessions.push(session);
 
+        this.updateSheets();
         this.updateFile();
     }
 
