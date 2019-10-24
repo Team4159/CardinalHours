@@ -29,8 +29,8 @@ class UserStore {
         this.eventEmitter.on('signInUser', handler);
     }
 
-    signOutUser(user) {
-        this.eventEmitter.emit('signOutUser', DB.query(user));
+    signOutUser(user, session) {
+        this.eventEmitter.emit('signOutUser', { user: DB.query(user), session });
     }
 
     onSignOutUser(handler) {

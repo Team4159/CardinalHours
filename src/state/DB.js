@@ -15,23 +15,12 @@ class DB {
             this.users = [];
         }
 
-        fs.watch(this.filename, (event, filename) => {
-            if (filename) {
-                if (this.fsWait) return;
-                this.fsWait = setTimeout(() => {
-                    this.fsWait = false;
-                }, 100);
-                this.users = JSON.parse(fs.readFileSync(this.filename));
-            }
+        fs.watchFile(this.filename, () => {
+            this.users = JSON.parse(fs.readFileSync(this.filename));
         });
     }
 
     updateFile() {
-        this.fsWait = true;
-        this.fsWait = setTimeout(() => {
-            this.fsWait = false;
-        }, 100);
-
         fs.writeFileSync(this.filename, JSON.stringify(this.users));
     }
 

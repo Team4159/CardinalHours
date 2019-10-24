@@ -33,8 +33,11 @@ export default class TimeTable extends Component {
                 } else {
                     const session = this.state.sessions[index];
                     session.session.end = moment().toISOString();
-                    DB.addSession(session.user, session.session);
-                    UserStore.signOutUser(session.user);
+                    const duration = moment(session.session.end).diff(session.session.start);
+                    if (duration > moment.duration(5, 'seconds') && duration < moment.duration(12, 'hours')) {
+                        DB.addSession(session.user, session.session);
+                    }
+                    UserStore.signOutUser(session.user, session.session);
                 }
             }
 
@@ -59,22 +62,25 @@ export default class TimeTable extends Component {
 
         UserStore.onSignInUser(user => this.setState({
             sessions: this.state.sessions.concat([{
-                user,
+                user: {
+                    name: user.name,
+                    id: user.id
+                },
                 session: {
                     start: moment().toISOString()
                 }
             }])
         }));
 
-        UserStore.onSignOutUser(user => {
+        UserStore.onSignOutUser(({ user }) => {
             const index = this.state.sessions.findIndex(session => session.user.id === user.id);
 
-            const newUsers = this.state.sessions.slice();
+            const newSessions = this.state.sessions.slice();
 
-            newUsers.splice(index, 1);
+            newSessions.splice(index, 1);
 
             this.setState({
-                sessions: newUsers
+                sessions: newSessions
             });
         });
     }

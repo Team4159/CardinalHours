@@ -27,10 +27,10 @@ export default class LastActionDisplay extends Component {
             total_time: DB.getTotalTime(user)
         }));
 
-        UserStore.onSignOutUser(user => this.setState({
+        UserStore.onSignOutUser(({ user, session }) => this.setState({
             name: user.name,
             action: 'OUT',
-            session_time: moment(user.sessions[user.sessions.length - 1].end).diff(user.sessions[user.sessions.length - 1].start),
+            session_time: moment(session.end).diff(session.start),
             total_time: DB.getTotalTime(user)
         }));
     }
