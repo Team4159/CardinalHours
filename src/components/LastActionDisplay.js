@@ -16,6 +16,7 @@ export default class LastActionDisplay extends Component {
             action: '',
             session_time: 0,
             total_time: 0,
+            friday_meetings: 0
         };
     }
 
@@ -24,14 +25,16 @@ export default class LastActionDisplay extends Component {
             name: user.name,
             action: 'IN',
             session_time: 'N/A',
-            total_time: DB.getTotalTime(user)
+            total_time: DB.getTotalTime(user),
+            friday_meetings: DB.getFridayMeetings(user)
         }));
 
         UserStore.onSignOutUser(({ user, session }) => this.setState({
             name: user.name,
             action: 'OUT',
             session_time: moment(session.end).diff(session.start),
-            total_time: DB.getTotalTime(user)
+            total_time: DB.getTotalTime(user),
+            friday_meetings: DB.getFridayMeetings(user)
         }));
     }
 
@@ -44,7 +47,9 @@ export default class LastActionDisplay extends Component {
                 <p className='lead'>
                     Session Time: { typeof this.state.session_time === 'number' ? TimeTable.formatTime(this.state.session_time) : this.state.session_time }
                     <br/>
-                    Total time: { TimeTable.formatTime(this.state.total_time) }
+                    Total Time: { TimeTable.formatTime(this.state.total_time) }
+                    <br/>
+                    Friday Meetings: { this.state.friday_meetings }
                 </p>
             </Jumbotron>
         );

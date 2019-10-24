@@ -45,7 +45,13 @@ class DB {
     }
 
     getTotalTime(user) {
-        return this.query(user).sessions.reduce((acc, cur) => acc + moment(cur.end).diff(moment(cur.start)), 0);
+        user = this.query(user);
+        return user.sessions.reduce((acc, cur) => acc + moment(cur.end).diff(moment(cur.start)), 0) + user.imported_hours ? user.imported_hours : 0;
+    }
+
+    getFridayMeetings(user) {
+        user = this.query(user);
+        return user.sessions.filter(session => moment(session.start).isoWeekday() === 5).length + user.imported_meetings ? user.imported_meetings : 0;
     }
 
     query(query) {
