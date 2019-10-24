@@ -23,25 +23,7 @@ export default class LastActionDisplay extends Component {
     }
 
     componentDidMount() {
-        UserStore.onSignInUser(user => this.setState({
-            name: user.name,
-            action: 'IN',
-            session_time: 'N/A',
-            total_time: DB.getTotalUserTime(user),
-            additional_fields: this.populateAdditionalFields(user)
-        }));
-
-        UserStore.onSignOutUser(({ user, session }) => this.setState({
-            name: user.name,
-            action: 'OUT',
-            session_time: moment(session.end).diff(session.start),
-            total_time: DB.getTotalUserTime(user),
-            additional_fields: this.populateAdditionalFields(user)
-        }));
-    }
-
-    populateAdditionalFields(user) {
-        return Object.assign(
+        const populateAdditionalFields = (user) => (Object.assign(
             Object.keys(config.day_counters).reduce((acc, cur) => {
                 acc[cur] = DB.getTotalCertainDays(user, config.day_counters[cur]);
                 return acc;
@@ -50,7 +32,23 @@ export default class LastActionDisplay extends Component {
                 acc[cur] = TimeTable.formatTime(DB.getTotalTimeInRange(user, ...config.hour_counters[cur]));
                 return acc;
             }, {})
-        );
+        ));
+
+        UserStore.onSignInUser(user => this.setState({
+            name: user.name,
+            action: 'IN',
+            session_time: 'N/A',
+            total_time: DB.getTotalUserTime(user),
+            additional_fields: populateAdditionalFields(user)
+        }));
+
+        UserStore.onSignOutUser(({ user, session }) => this.setState({
+            name: user.name,
+            action: 'OUT',
+            session_time: moment(session.end).diff(session.start),
+            total_time: DB.getTotalUserTime(user),
+            additional_fields: populateAdditionalFields(user)
+        }));
     }
 
     render() {
