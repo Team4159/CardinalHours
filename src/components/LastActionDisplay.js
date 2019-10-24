@@ -7,7 +7,7 @@ import TimeTable from './TimeTable';
 import UserStore from '../state/UserStore';
 import DB from '../state/DB';
 
-let config = require("../state/config.json");
+const config = require("../state/config.json");
 
 
 export default class LastActionDisplay extends Component {
@@ -53,7 +53,6 @@ export default class LastActionDisplay extends Component {
             additional_fields[hour_counter] = TimeTable.formatTime(DB.getTotalTimeInRange(user, config.hour_counters[hour_counter]));
         }
 
-        console.log(additional_fields);
         return additional_fields;
     }
 
@@ -67,10 +66,9 @@ export default class LastActionDisplay extends Component {
                     Session Time: { typeof this.state.session_time === 'number' ? TimeTable.formatTime(this.state.session_time) : this.state.session_time }
                     <br/>
                     Total Time: { TimeTable.formatTime(this.state.total_time) }
-                    <br/>
                     {
                         Object.keys(this.state.additional_fields).map((key) => (
-                            key + ": " + this.state.additional_fields[key]
+                            [<br/>, key + ": " + this.state.additional_fields[key]]
                         ))
                     }
                 </p>

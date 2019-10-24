@@ -3,6 +3,9 @@ import path from 'path';
 import os from 'os';
 import moment from 'moment';
 import GoogleSpreadsheet from 'google-spreadsheet';
+import TimeTable from "../components/TimeTable";
+
+const config = require("../state/config.json");
 
 class DB {
     constructor() {
@@ -36,12 +39,27 @@ class DB {
                 for (let row of rows) {
                     let user = this.query({name: row.name});
                     if (user !== undefined) {
-                        row.hours = (this.getTotalUserTime(user) / 3600000).toFixed(2);
-                        row.save(console.error);
+                        row.hours = DB.millisToHours(this.getTotalUserTime(user));
+                        row.teamdays = this.getTotalUserDays(user);
+
+                        for (let day_counter of Object.keys(config.day_counters)) {
+                            row[day_counter] = this.getTotalCertainDays(user, config.day_counters[day_counter]);
+                        }
+
+                        for (let hour_counter of Object.keys(config.hour_counters)) {
+                            row[hour_counter] = DB.millisToHours(this.getTotalTimeInRange(user, config.hour_counters[hour_counter]));
+                        }
                     }
+
+                    row.save(console.error);
                 }
             });
+
         });
+    }
+
+    static millisToHours(millis) {
+        return (millis / 3600000).toFixed(2)
     }
 
     addUser(user) {
@@ -94,7 +112,7 @@ class DB {
 
     getTotalUserDays(user) {
         user = this.query(user);
-        return this.getTotalDays(user);
+        return this.getTotalDays(user.sessions);
     }
 
     getTotalCertainDays(user, day) {
