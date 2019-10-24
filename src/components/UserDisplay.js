@@ -3,8 +3,6 @@ import { Container, Button, Input } from 'reactstrap';
 
 import UserStore from '../state/UserStore';
 
-const config = require("../state/config.json");
-
 export default class UserDisplay extends Component {
     constructor(props) {
         super(props);
@@ -45,32 +43,28 @@ export default class UserDisplay extends Component {
     }
 
     render() {
-        if (config.sign_ups) {
-            return (
-                <Container className='UserDisplay'>
-                    <form onSubmit={ this.onSubmit }>
-                        <Input
-                            name='name'
-                            placeholder='Name'
-                            value={ this.state.name }
-                            onChange={ this.handleChange }
-                        />
-                        <Input
-                            name='id'
-                            placeholder='Student ID'
-                            value={ this.state.id }
-                            onChange={ this.handleChange }
-                        />
-                        <Button
-                            color='light'
-                            onClick={ this.onSubmit }
-                            type='submit'
-                        >Add New User</Button>
-                    </form>
-                </Container>
-            )
-        } else {
-            return false;
-        }
+        return (
+            <Container className='UserDisplay'>
+                <form onSubmit={ this.onSubmit }>
+                    <Input
+                        name='name'
+                        placeholder='Name'
+                        value={ this.state.name }
+                        onChange={ this.handleChange }
+                    />
+                    <Input
+                        name='id'
+                        placeholder='Student ID'
+                        value={ this.state.id }
+                        onChange={ this.handleChange }
+                    />
+                    <Button
+                        color='light'
+                        onClick={ this.onSubmit }
+                        type='submit'
+                    >Add New User</Button>
+                </form>
+            </Container>
+        );
     }
 }

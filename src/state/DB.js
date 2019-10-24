@@ -3,9 +3,8 @@ import path from 'path';
 import os from 'os';
 import moment from 'moment';
 import GoogleSpreadsheet from 'google-spreadsheet';
-import TimeTable from "../components/TimeTable";
 
-const config = require("../state/config.json");
+import config from '../state/config.json';
 
 class DB {
     constructor() {
@@ -34,12 +33,15 @@ class DB {
     }
 
     updateSheets(user) {
-        if (user === undefined) return;
-        this.sheet.useServiceAccountAuth(this.creds, err => {
+        this.sheet.useServiceAccountAuth(this.creds, () => {
             this.sheet.getRows(1, (err, rows) => {
+                if (err) return console.error(err);
+
+                const formatTime = millis => (millis / 1000 / 60 / 60).toFixed(2);
+
                 let row = rows.find(row => row.name === user.name);
 
-                row.hours = DB.millisToHours(this.getTotalUserTime(user));
+                row.hours = formatTime(this.getTotalUserTime(user));
                 row.teamdays = this.getTotalUserDays(user);
 
                 for (let day_counter of Object.keys(config.day_counters)) {
@@ -47,16 +49,12 @@ class DB {
                 }
 
                 for (let hour_counter of Object.keys(config.hour_counters)) {
-                    row[hour_counter] = DB.millisToHours(this.getTotalTimeInRange(user, config.hour_counters[hour_counter]));
+                    row[hour_counter] = formatTime(this.getTotalTimeInRange(user, config.hour_counters[hour_counter]));
                 }
 
-                row.save(console.error);
+                row.save(err => err ? console.error(err) : null);
             })
         });
-    }
-
-    static millisToHours(millis) {
-        return (millis / 3600000).toFixed(2)
     }
 
     addUser(user) {
@@ -95,11 +93,10 @@ class DB {
         return (user.imported_hours ? moment.duration(user.imported_hours, 'hours') : 0) + this.getTotalTime(user.sessions);
     }
 
-    getTotalTimeInRange(user, range) {
+    getTotalTimeInRange(user, start, end) {
         user = this.query(user);
-        //if (range === undefined) return 0;
-        let start = moment(range[0]);
-        let end = moment(range[1]);
+        start = moment(start);
+        end = moment(end);
         return this.getTotalTime(user.sessions.filter(session => moment(session.start).isBetween(start, end)));
     }
 

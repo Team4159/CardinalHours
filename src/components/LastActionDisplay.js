@@ -7,8 +7,7 @@ import TimeTable from './TimeTable';
 import UserStore from '../state/UserStore';
 import DB from '../state/DB';
 
-const config = require("../state/config.json");
-
+import config from '../state/config.json';
 
 export default class LastActionDisplay extends Component {
     constructor(props) {
@@ -19,7 +18,6 @@ export default class LastActionDisplay extends Component {
             action: '',
             session_time: 0,
             total_time: 0,
-            total_days: 0,
             additional_fields: {}
         };
     }
@@ -43,17 +41,16 @@ export default class LastActionDisplay extends Component {
     }
 
     populateAdditionalFields(user) {
-        let additional_fields = {};
-
-        for (let day_counter of Object.keys(config.day_counters)) {
-            additional_fields[day_counter] = DB.getTotalCertainDays(user, config.day_counters[day_counter]);
-        }
-
-        for (let hour_counter of Object.keys(config.hour_counters)) {
-            additional_fields[hour_counter] = TimeTable.formatTime(DB.getTotalTimeInRange(user, config.hour_counters[hour_counter]));
-        }
-
-        return additional_fields;
+        return Object.assign(
+            Object.keys(config.day_counters).reduce((acc, cur) => {
+                acc[cur] = DB.getTotalCertainDays(user, config.day_counters[cur]);
+                return acc;
+            }, {}),
+            Object.keys(config.hour_counters).reduce((acc, cur) => {
+                acc[cur] = TimeTable.formatTime(DB.getTotalTimeInRange(user, ...config.hour_counters[cur]));
+                return acc;
+            }, {})
+        );
     }
 
     render() {
@@ -67,8 +64,8 @@ export default class LastActionDisplay extends Component {
                     <br/>
                     Total Time: { TimeTable.formatTime(this.state.total_time) }
                     {
-                        Object.keys(this.state.additional_fields).map((key) => (
-                            [<br/>, key + ": " + this.state.additional_fields[key]]
+                        Object.keys(this.state.additional_fields).map((key, idx) => (
+                            [<br key={ idx }/>, key + ": " + this.state.additional_fields[key]]
                         ))
                     }
                 </p>

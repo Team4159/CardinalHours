@@ -5,6 +5,8 @@ import TimeTable from './TimeTable';
 import UserDisplay from './UserDisplay';
 import LastActionDisplay from './LastActionDisplay';
 
+import config from '../state/config.json';
+
 export default class MainContainer extends Component {
     constructor(props) {
         super(props);
@@ -13,12 +15,12 @@ export default class MainContainer extends Component {
     render() {
         return (
             <Container className='MainContainer'>
-                <h1>CardinalHours</h1>
+                <h1 className='Header'>CardinalHours</h1>
                 <Row>
                     <Col>
-                        <Row style={ { height: '25%' } }>
+                        { config.sign_ups ? <Row style={ { height: '25%' } }>
                             <UserDisplay/>
-                        </Row>
+                        </Row> : null }
                         <Row style={ { height: '75%' } }>
                             <LastActionDisplay/>
                         </Row>
