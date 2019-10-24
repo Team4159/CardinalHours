@@ -7,6 +7,9 @@ import TimeTable from './TimeTable';
 import UserStore from '../state/UserStore';
 import DB from '../state/DB';
 
+let config = require("../state/config.json");
+
+
 export default class LastActionDisplay extends Component {
     constructor(props) {
         super(props);
@@ -16,7 +19,8 @@ export default class LastActionDisplay extends Component {
             action: '',
             session_time: 0,
             total_time: 0,
-            friday_meetings: 0
+            total_days: 0,
+            additional_fields: {}
         };
     }
 
@@ -25,17 +29,32 @@ export default class LastActionDisplay extends Component {
             name: user.name,
             action: 'IN',
             session_time: 'N/A',
-            total_time: DB.getTotalTime(user),
-            friday_meetings: DB.getFridayMeetings(user)
+            total_time: DB.getTotalUserTime(user),
+            additional_fields: this.populateAdditionalFields(user)
         }));
 
         UserStore.onSignOutUser(({ user, session }) => this.setState({
             name: user.name,
             action: 'OUT',
             session_time: moment(session.end).diff(session.start),
-            total_time: DB.getTotalTime(user),
-            friday_meetings: DB.getFridayMeetings(user)
+            total_time: DB.getTotalUserTime(user),
+            additional_fields: this.populateAdditionalFields(user)
         }));
+    }
+
+    populateAdditionalFields(user) {
+        let additional_fields = {};
+
+        for (let day_counter of Object.keys(config.day_counters)) {
+            additional_fields[day_counter] = DB.getTotalCertainDays(user, config.day_counters[day_counter]);
+        }
+
+        for (let hour_counter of Object.keys(config.hour_counters)) {
+            additional_fields[hour_counter] = TimeTable.formatTime(DB.getTotalTimeInRange(user, config.hour_counters[hour_counter]));
+        }
+
+        console.log(additional_fields);
+        return additional_fields;
     }
 
     render() {
@@ -49,9 +68,14 @@ export default class LastActionDisplay extends Component {
                     <br/>
                     Total Time: { TimeTable.formatTime(this.state.total_time) }
                     <br/>
-                    Friday Meetings: { this.state.friday_meetings }
+                    {
+                        Object.keys(this.state.additional_fields).map((key) => (
+                            key + ": " + this.state.additional_fields[key]
+                        ))
+                    }
                 </p>
             </Jumbotron>
         );
     }
+
 }

@@ -1,0 +1,5 @@
+{
+  "sign_ups": true,
+  "day_counters": {"Friday Meetings": 5},
+  "hour_counters": {"Build Season Hours": ["2020-01-04", "2020-08-04"]}
+}

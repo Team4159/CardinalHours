@@ -36,7 +36,7 @@ class DB {
                 for (let row of rows) {
                     let user = this.query({name: row.name});
                     if (user !== undefined) {
-                        row.hours = (this.getTotalTime(user) / 3600000).toFixed(2);
+                        row.hours = (this.getTotalUserTime(user) / 3600000).toFixed(2);
                         row.save(console.error);
                     }
                 }
@@ -65,20 +65,41 @@ class DB {
         this.updateFile();
     }
 
-    getTotalTime(user) {
-        user = this.query(user);
-        return (user.imported_hours ? moment.duration(user.imported_hours, 'hours') : 0) + user.sessions.reduce((acc, cur) => acc + moment(cur.end).diff(moment(cur.start)), 0);
-    }
-
-    getFridayMeetings(user) {
-        user = this.query(user);
-        return (user.imported_meetings ? user.imported_meetings : 0) + user.sessions.filter(session => moment(session.start).isoWeekday() === 5).length;
-    }
-
     query(query) {
         return this.users.find(user => Object.keys(query)
             .every(key => query[key] === user[key])
         );
+    }
+
+    getTotalTime(sessions) {
+        return sessions.reduce((acc, cur) => acc + moment(cur.end).diff(moment(cur.start)), 0);
+    }
+
+    getTotalUserTime(user) {
+        user = this.query(user);
+        return (user.imported_hours ? moment.duration(user.imported_hours, 'hours') : 0) + this.getTotalTime(user.sessions);
+    }
+
+    getTotalTimeInRange(user, range) {
+        user = this.query(user);
+        //if (range === undefined) return 0;
+        let start = moment(range[0]);
+        let end = moment(range[1]);
+        return this.getTotalTime(user.sessions.filter(session => moment(session.start).isBetween(start, end)));
+    }
+
+    getTotalDays(sessions) {
+        return sessions.filter((session, index) => index === 0 || !moment(session.start).isSame(moment(sessions[index - 1]), 'day')).length;
+    }
+
+    getTotalUserDays(user) {
+        user = this.query(user);
+        return this.getTotalDays(user);
+    }
+
+    getTotalCertainDays(user, day) {
+        user = this.query(user);
+        return (day === 5 && user.imported_meetings ? user.imported_meetings : 0) + this.getTotalDays(user.sessions.filter(session => moment(session.start).isoWeekday === day));
     }
 }
 
