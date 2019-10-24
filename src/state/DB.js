@@ -33,28 +33,25 @@ class DB {
         fs.writeFileSync(this.filename, JSON.stringify(this.users));
     }
 
-    updateSheets() {
+    updateSheets(user) {
+        if (user === undefined) return;
         this.sheet.useServiceAccountAuth(this.creds, err => {
             this.sheet.getRows(1, (err, rows) => {
-                for (let row of rows) {
-                    let user = this.query({name: row.name});
-                    if (user !== undefined) {
-                        row.hours = DB.millisToHours(this.getTotalUserTime(user));
-                        row.teamdays = this.getTotalUserDays(user);
+                let row = rows.find(row => row.name === user.name);
 
-                        for (let day_counter of Object.keys(config.day_counters)) {
-                            row[day_counter] = this.getTotalCertainDays(user, config.day_counters[day_counter]);
-                        }
+                row.hours = DB.millisToHours(this.getTotalUserTime(user));
+                row.teamdays = this.getTotalUserDays(user);
 
-                        for (let hour_counter of Object.keys(config.hour_counters)) {
-                            row[hour_counter] = DB.millisToHours(this.getTotalTimeInRange(user, config.hour_counters[hour_counter]));
-                        }
-                    }
-
-                    row.save(console.error);
+                for (let day_counter of Object.keys(config.day_counters)) {
+                    row[day_counter] = this.getTotalCertainDays(user, config.day_counters[day_counter]);
                 }
-            });
 
+                for (let hour_counter of Object.keys(config.hour_counters)) {
+                    row[hour_counter] = DB.millisToHours(this.getTotalTimeInRange(user, config.hour_counters[hour_counter]));
+                }
+
+                row.save(console.error);
+            })
         });
     }
 
@@ -79,7 +76,7 @@ class DB {
     addSession(user, session) {
         this.query(user).sessions.push(session);
 
-        this.updateSheets();
+        this.updateSheets(user);
         this.updateFile();
     }
 
