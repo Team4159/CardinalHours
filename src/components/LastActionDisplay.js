@@ -16,25 +16,36 @@ export default class LastActionDisplay extends Component {
             action: '',
             session_time: 0,
             total_time: 0,
-            friday_meetings: 0
+            additional_fields: {}
         };
     }
 
     componentDidMount() {
+        const populateAdditionalFields = user => (Object.assign(
+            Object.keys(DB.config.day_counters).reduce((acc, cur) => {
+                acc[cur] = DB.getTotalCertainDays(user, DB.config.day_counters[cur]);
+                return acc;
+            }, {}),
+            Object.keys(DB.config.hour_counters).reduce((acc, cur) => {
+                acc[cur] = TimeTable.formatTime(DB.getTotalTimeInRange(user, ...DB.config.hour_counters[cur]));
+                return acc;
+            }, {})
+        ));
+
         UserStore.onSignInUser(user => this.setState({
             name: user.name,
             action: 'IN',
             session_time: 'N/A',
-            total_time: DB.getTotalTime(user),
-            friday_meetings: DB.getFridayMeetings(user)
+            total_time: DB.getTotalUserTime(user),
+            additional_fields: populateAdditionalFields(user)
         }));
 
         UserStore.onSignOutUser(({ user, session }) => this.setState({
             name: user.name,
             action: 'OUT',
             session_time: moment(session.end).diff(session.start),
-            total_time: DB.getTotalTime(user),
-            friday_meetings: DB.getFridayMeetings(user)
+            total_time: DB.getTotalUserTime(user),
+            additional_fields: populateAdditionalFields(user)
         }));
     }
 
@@ -48,10 +59,14 @@ export default class LastActionDisplay extends Component {
                     Session Time: { typeof this.state.session_time === 'number' ? TimeTable.formatTime(this.state.session_time) : this.state.session_time }
                     <br/>
                     Total Time: { TimeTable.formatTime(this.state.total_time) }
-                    <br/>
-                    Friday Meetings: { this.state.friday_meetings }
+                    {
+                        Object.keys(this.state.additional_fields).map((key, idx) => (
+                            [<br key={ idx }/>, key + ": " + this.state.additional_fields[key]]
+                        ))
+                    }
                 </p>
             </Jumbotron>
         );
     }
+
 }
