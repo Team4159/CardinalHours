@@ -21,23 +21,12 @@ class DB {
             this.users = [];
         }
 
-        fs.watch(this.filename, (event, filename) => {
-            if (filename) {
-                if (this.fsWait) return;
-                this.fsWait = setTimeout(() => {
-                    this.fsWait = false;
-                }, 100);
-                this.users = JSON.parse(fs.readFileSync(this.filename));
-            }
+        fs.watchFile(this.filename, () => {
+            this.users = JSON.parse(fs.readFileSync(this.filename));
         });
     }
 
     updateFile() {
-        this.fsWait = true;
-        this.fsWait = setTimeout(() => {
-            this.fsWait = false;
-        }, 100);
-
         fs.writeFileSync(this.filename, JSON.stringify(this.users));
     }
 
@@ -77,7 +66,13 @@ class DB {
     }
 
     getTotalTime(user) {
-        return this.query(user).sessions.reduce((acc, cur) => acc + moment(cur.end).diff(moment(cur.start)), 0);
+        user = this.query(user);
+        return (user.imported_hours ? moment.duration(user.imported_hours, 'hours') : 0) + user.sessions.reduce((acc, cur) => acc + moment(cur.end).diff(moment(cur.start)), 0);
+    }
+
+    getFridayMeetings(user) {
+        user = this.query(user);
+        return (user.imported_meetings ? user.imported_meetings : 0) + user.sessions.filter(session => moment(session.start).isoWeekday() === 5).length;
     }
 
     query(query) {
@@ -87,11 +82,6 @@ class DB {
     }
 }
 
-let instance;
+let instance = new DB();
 
-export default {
-    getInstance() {
-        if (instance === undefined) instance = new DB();
-        return instance;
-    }
-}
+export default instance;

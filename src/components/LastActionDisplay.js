@@ -11,30 +11,30 @@ export default class LastActionDisplay extends Component {
     constructor(props) {
         super(props);
 
-        this.UserStore = UserStore.getInstance();
-        this.DB = DB.getInstance();
-
         this.state = {
             name: '',
             action: '',
             session_time: 0,
             total_time: 0,
+            friday_meetings: 0
         };
     }
 
     componentDidMount() {
-        this.UserStore.onSignInUser(user => this.setState({
+        UserStore.onSignInUser(user => this.setState({
             name: user.name,
             action: 'IN',
             session_time: 'N/A',
-            total_time: this.DB.getTotalTime(user)
+            total_time: DB.getTotalTime(user),
+            friday_meetings: DB.getFridayMeetings(user)
         }));
 
-        this.UserStore.onSignOutUser(user => this.setState({
+        UserStore.onSignOutUser(({ user, session }) => this.setState({
             name: user.name,
             action: 'OUT',
-            session_time: moment(user.sessions[user.sessions.length - 1].end).diff(user.sessions[user.sessions.length - 1].start),
-            total_time: this.DB.getTotalTime(user)
+            session_time: moment(session.end).diff(session.start),
+            total_time: DB.getTotalTime(user),
+            friday_meetings: DB.getFridayMeetings(user)
         }));
     }
 
@@ -47,7 +47,9 @@ export default class LastActionDisplay extends Component {
                 <p className='lead'>
                     Session Time: { typeof this.state.session_time === 'number' ? TimeTable.formatTime(this.state.session_time) : this.state.session_time }
                     <br/>
-                    Total time: { TimeTable.formatTime(this.state.total_time) }
+                    Total Time: { TimeTable.formatTime(this.state.total_time) }
+                    <br/>
+                    Friday Meetings: { this.state.friday_meetings }
                 </p>
             </Jumbotron>
         );
