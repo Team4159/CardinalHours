@@ -46,7 +46,7 @@ class DB {
 
     getTotalTime(user) {
         user = this.query(user);
-        return user.sessions.reduce((acc, cur) => acc + moment(cur.end).diff(moment(cur.start)), 0) + user.imported_hours ? user.imported_hours : 0;
+        return (user.imported_hours ? moment.duration(user.imported_hours, 'hours') : 0) + user.sessions.reduce((acc, cur) => acc + moment(cur.end).diff(moment(cur.start)), 0);
     }
 
     getFridayMeetings(user) {

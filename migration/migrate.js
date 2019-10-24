@@ -38,7 +38,7 @@ for (let member of current_hours) {
         // console.log(member['First Name'] + ' ' + member['Last Name'] + ' - Rookie has ' + imported_hours.toFixed(2) + ' Hours');
     }
     imported_meetings = Math.min(imported_meetings, 5);
-    console.log(`${member['First Name']} ${member['Last Name']} ` + imported_meetings);
+    imported_hours = Number(imported_hours.toFixed(2));
     resolved.push({
         name: `${member['First Name']} ${member['Last Name']}`,
         id: member['ID'],
