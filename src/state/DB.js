@@ -51,7 +51,7 @@ class DB {
 
     getFridayMeetings(user) {
         user = this.query(user);
-        return user.sessions.filter(session => moment(session.start).isoWeekday() === 5).length + user.imported_meetings ? user.imported_meetings : 0;
+        return (user.imported_meetings ? user.imported_meetings : 0) + user.sessions.filter(session => moment(session.start).isoWeekday() === 5).length;
     }
 
     query(query) {
