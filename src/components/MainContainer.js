@@ -17,7 +17,7 @@ export default class MainContainer extends Component {
         return (
             <Container className='MainContainer'>
                 <h1 className='Header'>CardinalHours</h1>
-                { /* <AdminPanel/> */ }
+                  <AdminPanel/>
                 <Row>
                     <Col>
                         { DB.config.sign_ups ? <Row style={ { height: '25%' } }>
