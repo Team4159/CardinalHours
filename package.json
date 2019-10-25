@@ -12,8 +12,7 @@
     "start": "webpack-dev-server --hot --host 0.0.0.0 --config=./webpack.dev.config.js --mode development",
     "build": "webpack --config webpack.build.config.js --mode production",
     "package": "npm run build",
-    "postpackage": "electron-packager ./ --out=./builds --icon=./icon.icns --overwrite",
-    "windowspackage": "electron-packager ./ --out=./builds --platform=win32 --arch=x64 --arch=ia32 --icon=./icon.ico --overwrite"
+    "postpackage": "electron-packager ./ --out=./builds --icon=./icon.icns --overwrite && electron-packager ./ --out=./builds --platform=win32 --arch=x64 --arch=ia32 --icon=./icon.ico --overwrite"
   },
   "dependencies": {
     "bootstrap": "^4.2.1",
