@@ -10,10 +10,7 @@ class DB {
         this.filename = path.join(remote.getGlobal('dataPath'), 'users.json');
         this.fsWait = false;
 
-        // https://docs.google.com/spreadsheets/d/1N06gqxOtbdiD12g7-4PyYCE0RdWl6vOx2J1CkGexR3A/edit?usp=sharing
-        // writer@quickstart-1553556916205.iam.gserviceaccount.com
-        this.sheet = new GoogleSpreadsheet('1N06gqxOtbdiD12g7-4PyYCE0RdWl6vOx2J1CkGexR3A');
-        this.creds = require('./client_secret');
+        this.isDev = remote.getGlobal('isDev');
 
         this.config_filename = path.join(remote.getGlobal('dataPath'), 'config.json');
         if (fs.existsSync(this.config_filename)) {
@@ -33,10 +30,46 @@ class DB {
         fs.watchFile(this.filename, () => {
             this.users = JSON.parse(fs.readFileSync(this.filename));
         });
+
+        this.sheet = new GoogleSpreadsheet('12nTk04p89i9c8kYuU0PDXSfND5bEog5gyo3WoQlaYt0');
+        this.creds = require('./client_secret');
+
+        if (!this.isDev) {
+            this.hardSyncSheets();
+        }
     }
 
     updateFile() {
         fs.writeFileSync(this.filename, JSON.stringify(this.users));
+    }
+
+    populateRow(user, row) {
+        const formatTime = millis => (millis / 1000 / 60 / 60).toFixed(2);
+
+        row.hours = formatTime(this.getTotalUserTime(user));
+        row.teamdays = this.getTotalUserDays(user);
+
+        for (let day_counter of Object.keys(this.config.day_counters)) {
+            row[day_counter] = this.getTotalCertainDays(user, this.config.day_counters[day_counter]);
+        }
+
+        for (let hour_counter of Object.keys(this.config.hour_counters)) {
+            row[hour_counter] = formatTime(this.getTotalTimeInRange(user, this.config.hour_counters[hour_counter]));
+        }
+
+        row.save(err => err ? console.error(err) : null);
+    }
+
+    hardSyncSheets() {
+        this.sheet.useServiceAccountAuth(this.creds, () => {
+            this.sheet.getRows(1, (err, rows) => {
+                if (err) return console.error(err);
+
+                for (let row of rows) {
+                    this.populateRow(this.query({ name: row.name }), row);
+                }
+            })
+        });
     }
 
     updateSheets(user) {
@@ -44,22 +77,8 @@ class DB {
             this.sheet.getRows(1, (err, rows) => {
                 if (err) return console.error(err);
 
-                const formatTime = millis => (millis / 1000 / 60 / 60).toFixed(2);
-
                 let row = rows.find(row => row.name === user.name);
-
-                row.hours = formatTime(this.getTotalUserTime(user));
-                row.teamdays = this.getTotalUserDays(user);
-
-                for (let day_counter of Object.keys(this.config.day_counters)) {
-                    row[day_counter] = this.getTotalCertainDays(user, this.config.day_counters[day_counter]);
-                }
-
-                for (let hour_counter of Object.keys(this.config.hour_counters)) {
-                    row[hour_counter] = formatTime(this.getTotalTimeInRange(user, this.config.hour_counters[hour_counter]));
-                }
-
-                row.save(err => err ? console.error(err) : null);
+                this.populateRow(user, row);
             })
         });
     }
@@ -81,7 +100,9 @@ class DB {
     addSession(user, session) {
         this.query(user).sessions.push(session);
 
-        this.updateSheets(user);
+        if (!this.isDev) {
+            this.updateSheets(user);
+        }
         this.updateFile();
     }
 
