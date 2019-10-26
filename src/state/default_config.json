@@ -1,6 +1,6 @@
 {
   "sign_ups": true,
-  "day_counters": {"Num of Meetings": 5},
+  "day_counters": {"Num of Meetings": "Friday", "Total Build Season Days": ["2020-01-04", "2020-03-14"]},
   "hour_counters": {"Total Build Season Hours": ["2020-01-04", "2020-03-14"]},
   "sheets": {
     "sheet_id": "1fzDGhiWOrtCMfW4h54b55Wdnj0PGCT_emSwbDSES7-g",
