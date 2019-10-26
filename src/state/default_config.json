@@ -1,5 +1,9 @@
 {
   "sign_ups": true,
-  "day_counters": {"Friday Meetings": 5},
-  "hour_counters": {"Build Season Hours": ["2020-01-04", "2020-03-14"]}
+  "day_counters": {"Num of Meetings": 5},
+  "hour_counters": {"Total Build Season Hours": ["2020-01-04", "2020-03-14"]},
+  "sheets": {
+    "sheet_id": "1fzDGhiWOrtCMfW4h54b55Wdnj0PGCT_emSwbDSES7-g",
+    "worksheet_id": 7
+  }
 }

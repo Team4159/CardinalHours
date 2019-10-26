@@ -31,7 +31,7 @@ class DB {
             this.users = JSON.parse(fs.readFileSync(this.filename));
         });
 
-        this.sheet = new GoogleSpreadsheet('12nTk04p89i9c8kYuU0PDXSfND5bEog5gyo3WoQlaYt0');
+        this.sheet = new GoogleSpreadsheet(this.config.sheets.sheet_id);
         this.creds = require('./client_secret');
 
         if (!this.isDev) {
@@ -46,40 +46,46 @@ class DB {
     populateRow(user, row) {
         const formatTime = millis => (millis / 1000 / 60 / 60).toFixed(2);
 
-        row.hours = formatTime(this.getTotalUserTime(user));
-        row.teamdays = this.getTotalUserDays(user);
+        row['Total Team Hours'] = formatTime(this.getTotalUserTime(user));
 
         for (let day_counter of Object.keys(this.config.day_counters)) {
             row[day_counter] = this.getTotalCertainDays(user, this.config.day_counters[day_counter]);
         }
 
         for (let hour_counter of Object.keys(this.config.hour_counters)) {
-            row[hour_counter] = formatTime(this.getTotalTimeInRange(user, this.config.hour_counters[hour_counter]));
+            row[hour_counter] = formatTime(this.getTotalTimeInRange(user, ...this.config.hour_counters[hour_counter]));
         }
 
-        row.save(err => err ? console.error(err) : null);
+        row.save(err => {
+            if (err) {
+                setTimeout(() => this.populateRow(user, row), 1000);
+            }
+        });
     }
 
     hardSyncSheets() {
-        this.sheet.useServiceAccountAuth(this.creds, () => {
-            this.sheet.getRows(1, (err, rows) => {
+        this.sheet.useServiceAccountAuth(this.creds, err => {
+            if (err) return console.error(err);
+            this.sheet.getRows(this.config.sheets.worksheet_id, (err, rows) => {
                 if (err) return console.error(err);
 
                 for (let row of rows) {
-                    this.populateRow(this.query({ name: row.name }), row);
+                    if (row.first === "" && row.last === "") break;
+                    this.populateRow(this.query({ name: `${ row.first } ${ row.last }` }), row);
                 }
-            })
+            });
         });
     }
 
     updateSheets(user) {
-        this.sheet.useServiceAccountAuth(this.creds, () => {
-            this.sheet.getRows(1, (err, rows) => {
+        this.sheet.useServiceAccountAuth(this.creds, err => {
+            if (err) return console.error(err);
+            this.sheet.getRows(this.config.sheets.worksheet_id, (err, rows) => {
                 if (err) return console.error(err);
 
-                let row = rows.find(row => row.name === user.name);
+                let row = rows.find(row =>  `${ row.first } ${ row.last }` === user.name);
                 this.populateRow(user, row);
-            })
+            });
         });
     }
 
@@ -139,7 +145,7 @@ class DB {
 
     getTotalCertainDays(user, day) {
         user = this.query(user);
-        return (day === 5 && user.imported_meetings ? user.imported_meetings : 0) + this.getTotalDays(user.sessions.filter(session => moment(session.start).isoWeekday === day));
+        return (day === 5 && user.imported_meetings ? user.imported_meetings : 0) + this.getTotalDays(user.sessions.filter(session => moment(session.start).isoWeekday() === day));
     }
 }
 
