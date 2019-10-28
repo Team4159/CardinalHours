@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import {Button, Input} from 'reactstrap';
+import {Button, Input, Row} from 'reactstrap';
 import ReactModal from "react-modal";
 import DB from '../state/DB'
-//import config from '../state/config.json';
+import UserDisplay from './UserDisplay';
+let source = DB.config_filename;
 import moment from "moment";
 import fs from 'fs';
 
@@ -14,10 +15,10 @@ export default class AdminPanel extends Component {
         this.state = {
             showModal: false,
             showSetDate: false,
+            addStudents: DB.config.sign_ups,
             startDate: '',
             endDate: '',
             period: "Build Season Hours",
-
         };
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -43,6 +44,12 @@ export default class AdminPanel extends Component {
     toggleSetDate(){
         this.setState({showSetDate: !this.state.showSetDate})
     }
+    toggleAddStudents(){
+        this.setState({addStudents: !this.state.addStudents})
+        DB.config.sign_ups = this.state.addStudents;
+        fs.writeFile(source, JSON.stringify(DB.config), (err) =>{if(err) return console.log(err)});
+        console.log(DB.config);
+    }
     setDate(event){
         event.preventDefault();
 
@@ -63,10 +70,14 @@ export default class AdminPanel extends Component {
         config.hour_counters[this.state.period][0] = s;
         config.hour_counters[this.state.period][1] = e;
         //let source=  './src/state/default_config.json';
-        let source = DB.config_filename;
         fs.writeFile(source, JSON.stringify(config), (err) =>{if(err) return console.log(err)});
         console.log(DB.config);
     }
+    dropUser(user){
+        const dropper = DB.query({user});
+
+    }
+
 
     render() {
         return (
@@ -84,8 +95,10 @@ export default class AdminPanel extends Component {
                         }
                     }}
                 >
-                    <Button className='memberTable'>
-                        View times/drop members
+                    <Button
+                        onClick={this}
+                        className='memberTable'
+                    >Drop members
                     </Button>
                     <div></div>
                     <Button
@@ -114,10 +127,24 @@ export default class AdminPanel extends Component {
                             >Enter</Button> </form>
                         </div>    : null}
                     <div></div>
+                    <div>Add new users</div>
+                    <div></div>
+                    <Button
+                        className="offButton"
+                        onClick={this.toggleAddStudents.bind(this)}
+                        style = {{
+                                color: !this.state.addStudents ? "green" : "red"
+                        }}
+
+                    >{!this.state.addStudents ? "On" : "Off"}</Button>
+                    <div></div>
                     <button
                         onClick={this.handleCloseModal}
                     >Close</button>
                 </ReactModal>
+                {DB.config.sign_ups ? <Row style={ { height: '25%' } }>
+                        <UserDisplay/>
+                    </Row> : null }
             </div>
         );
     }
