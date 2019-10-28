@@ -12,60 +12,92 @@ export default class AdminPanel extends Component {
         super(props);
 
         this.state = {
+            config: {},
+            hour_counters: {},
+            day_counters: {},
             showModal: false,
-            showSetDate: false,
-            startDate: '',
-            endDate: '',
-            period: "Build Season Hours",
-
         };
+
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
 
-        this.handleChange = this.handleChange.bind(this);
+        this.handleHourCounter = this.handleHourCounter.bind(this);
+        this.handleClick = this.handleClick.bind(this);
         this.setDate = this.setDate.bind(this);
     }
-    handleOpenModal () {
-        this.setState({ showModal: true });
-    }
 
-    handleCloseModal () {
-        this.setState({ showModal: false });
-    }
+    componentWillMount() {
+        const config = DB.config;
 
-    handleChange(event) {
+        const format = key => Object.keys(config[key]).reduce((acc, cur) => {
+            acc[cur] = false;
+            return acc;
+        }, {});
+
+        let hourCounters = format("hour_counters");
+        let dayCounters = format("day_counters");
+
         this.setState({
-            [event.target.name]: event.target.value
+            config: config,
+            hour_counters: hourCounters,
+            day_counters: dayCounters
         });
     }
 
-
-    toggleSetDate(){
-        this.setState({showSetDate: !this.state.showSetDate})
+    handleOpenModal() {
+        this.setState({ showModal: true });
     }
-    setDate(event){
-        event.preventDefault();
 
+    handleCloseModal() {
+        this.setState({ showModal: false });
+    }
 
-        let s = moment(this.state.startDate).format('YYYY-MM-DD');
-        let e = moment(this.state.endDate).format('YYYY-MM-DD');
+    handleClick(counter, key) {
+        let obj = {};
 
-        if (s === "Invalid date" || e === "Invalid date"){
-            console.log(s);
-            console.log(e);
-            return null;
+        if (counter) {
+            obj[key] = !this.state.hour_counters[key];
+
+            this.setState({
+                hour_counters: {
+                    ...this.state.hour_counters,
+                    ...obj
+                }
+            })
+        } else {
+            obj[key] = !this.state.day_counters[key];
+
+            this.setState({
+                day_counters: {
+                    ...this.state.day_counters,
+                    ...obj
+                }
+            })
         }
-        //console.log(s);
-        // console.log(e);
-        console.log(s);
-        console.log(e);
-        let config = DB.config;
-        config.hour_counters[this.state.period][0] = s;
-        config.hour_counters[this.state.period][1] = e;
-        //let source=  './src/state/default_config.json';
-        let source = DB.config_filename;
-        fs.writeFile(source, JSON.stringify(config), (err) =>{if(err) return console.log(err)});
-        console.log(DB.config);
+    }
+
+    handleHourCounter(event, key) {
+        //console.log(key + ": " + event);
+    }
+
+    setDate(event) {
+        /**event.preventDefault();
+
+        let start = moment(this.state.startDate).format('YYYY-MM-DD');
+        let end = moment(this.state.endDate).format('YYYY-MM-DD');
+
+        if (start === "Invalid date" || end === "Invalid date") return false;
+
+        let config = this.state.config;
+        //config.hour_counters[this.state.period][0] = start;
+        //config.hour_counters[this.state.period][1] = end;
+
+        this.writeToFile(config);**/
+    }
+
+    writeToFile(newConfig) {
+        this.setState({config: newConfig});
+        fs.writeFile(source, JSON.stringify(this.state.config), err => err ? console.error(err) : null);
     }
 
     render() {
@@ -84,36 +116,64 @@ export default class AdminPanel extends Component {
                         }
                     }}
                 >
-                    <Button className='memberTable'>
-                        View times/drop members
-                    </Button>
-                    <div></div>
-                    <Button
-                        className='buildDate'
-                        onClick={this.toggleSetDate.bind(this)}
-                    >
-                        Change build season start and end date
-                    </Button>
-                    {this.state.showSetDate ?
-                        <div> <form onSubmit={this.setDate}>
-                            <Input
-                                name='startDate'
-                                placeholder='Enter build season start date'
-                                value = {this.state.startDate}
-                                onChange = {this.handleChange}
-                            />
-                            <Input
-                                name='endDate'
-                                placeholder='Enter build season end date'
-                                value = {this.state.endDate}
-                                onChange = {this.handleChange}
-                            />
-                            <Button
-                                onClick={this.setDate}
-                                type='submit'
-                            >Enter</Button> </form>
-                        </div>    : null}
-                    <div></div>
+                    {
+                        Object.keys(this.state.config.hour_counters).map((key, idx) => (
+                            [<Button onClick={() => this.handleClick("hour_counters", key)}>{key}</Button>, <br key={idx}/>]
+                        ))
+                    }
+
+                    {
+                        Object.keys(this.state.config.day_counters).map((key, idx) => (
+                            [<Button onClick={key => this.handleClick("day_counters", key)}>{key}</Button>, <br key={idx + this.state.config.hour_counters.length}/>]
+                        ))
+                    }
+
+                    {
+                        Object.keys(this.state.config.hour_counters).filter(key => this.state.hour_counters[key]).map((key, idx) => (
+                            <div key={idx}>
+                                <form onSubmit={this.setDate}>
+                                    <Input
+                                        name="start_date"
+                                        placeholder={key + " start date"}
+                                        value={this.state.config.hour_counters[key][0]}
+                                        onChange={key => this.handleHourCounter(event, key)}
+                                    />
+                                    <Input
+                                        name="start_date"
+                                        placeholder={key + " end date"}
+                                        value ={this.state.config.hour_counters[key][1]}
+                                        onChange={key => this.handleHourCounter(event, key)}
+                                    />
+                                    <Button
+                                        onClick={this.setDate}
+                                        type='submit'
+                                    >Submit</Button>
+                                </form>
+                            </div>))
+                    }
+
+                    {/**
+                        this.state.showSetDate ?
+                            <div> <form onSubmit={this.setDate}>
+                                <Input
+                                    name='startDate'
+                                    placeholder='Enter build season start date'
+                                    value = {this.state.startDate}
+                                    onChange = {this.handleChange}
+                                />
+                                <Input
+                                    name='endDate'
+                                    placeholder='Enter build season end date'
+                                    value = {this.state.endDate}
+                                    onChange = {this.handleChange}
+                                />
+                                <Button
+                                    onClick={this.setDate}
+                                    type='submit'
+                                >Enter</Button> </form>
+                            </div>
+                        : null **/
+                    }
                     <button
                         onClick={this.handleCloseModal}
                     >Close</button>
