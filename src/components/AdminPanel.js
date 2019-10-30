@@ -59,28 +59,20 @@ export default class AdminPanel extends Component {
         });
     }
 
-    handleClick(counter, shown) {
-        let obj = {
-            [shown]: !this.state[counter][shown]
-        };
-
+    handleClick(type, counter) {
         this.setState({
-            [counter]: {
-                ...this.state[counter],
-                ...obj
+            [type]: {
+                ...this.state[type],
+                [counter]: !this.state[type][counter]
             }
         })
     }
 
     toggleSignUps() {
-        let obj = {
-            sign_ups: !this.state.config.sign_ups,
-        };
-
         this.setState({
             config: {
                 ...this.state.config,
-                ...obj,
+                sign_ups: !this.state.config.sign_ups,
             }
         });
     }
