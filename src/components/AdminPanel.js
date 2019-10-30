@@ -17,7 +17,6 @@ export default class AdminPanel extends Component {
             hour_counters: {},
             day_counters: {},
             showModal: false,
-            addStudents: true
         };
 
         this.handleOpenModal = this.handleOpenModal.bind(this);
