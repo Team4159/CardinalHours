@@ -1,7 +1,8 @@
-import React, {Component} from 'react';
-import {Button, Input} from 'reactstrap';
+import React, { Component } from 'react';
+import {Button, Input, Row} from 'reactstrap';
 import ReactModal from "react-modal";
 import DB from '../state/DB'
+import UserDisplay from './UserDisplay';
 import moment from "moment";
 import fs from 'fs';
 
@@ -16,6 +17,7 @@ export default class AdminPanel extends Component {
             hour_counters: {},
             day_counters: {},
             showModal: false,
+            addStudents: DB.config.sign_ups,
         };
 
         this.handleOpenModal = this.handleOpenModal.bind(this);
@@ -69,6 +71,13 @@ export default class AdminPanel extends Component {
         })
     }
 
+    toggleAddStudents(){
+        this.setState({addStudents: !this.state.addStudents})
+        DB.config.sign_ups = this.state.addStudents;
+        fs.writeFile(source, JSON.stringify(DB.config), (err) =>{if(err) return console.log(err)});
+        console.log(DB.config);
+    }
+
     handleChange(event, type, counter, pos) {
         let obj = {[type]: {}};
 
@@ -98,7 +107,13 @@ export default class AdminPanel extends Component {
 
     writeToFile() {
         fs.writeFile(source, JSON.stringify(this.state.config), err => err ? console.error(err) : null);
+
     }
+
+    dropUser(user){
+        const dropper = DB.query({user});
+    }
+
 
     render() {
         return (
@@ -159,9 +174,30 @@ export default class AdminPanel extends Component {
                         >Submit</Button>
                     </form>
                     <Button
+                        onClick={this}
+                        className='memberTable'
+                    >Drop members
+                    </Button>
+                    <div></div>
+                    <div></div>
+                    <div>Add new users</div>
+                    <div></div>
+                    <Button
+                        className="offButton"
+                        onClick={this.toggleAddStudents.bind(this)}
+                        style = {{
+                                color: !this.state.addStudents ? "green" : "red"
+                        }}
+
+                    >{!this.state.addStudents ? "On" : "Off"}</Button>
+                    <div></div>
+                    <Button
                         onClick={this.handleCloseModal}
                     >Close</Button>
                 </ReactModal>
+                {DB.config.sign_ups ? <Row style={ { height: '25%' } }>
+                        <UserDisplay/>
+                    </Row> : null }
             </div>
         );
     }
