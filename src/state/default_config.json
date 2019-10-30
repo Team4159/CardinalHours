@@ -4,6 +4,9 @@
   "hour_counters": {"Total Build Season Hours": ["2020-01-04", "2020-03-14"]},
   "sheets": {
     "sheet_id": "1fzDGhiWOrtCMfW4h54b55Wdnj0PGCT_emSwbDSES7-g",
-    "worksheet_id": 7
+    "worksheet_id": 7,
+    "creds": {
+
+    }
   }
 }

@@ -13,12 +13,7 @@ class DB {
         this.isDev = remote.getGlobal('isDev');
 
         this.config_filename = path.join(remote.getGlobal('dataPath'), 'config.json');
-        if (fs.existsSync(this.config_filename)) {
-            this.config = JSON.parse(fs.readFileSync(this.config_filename));
-        } else {
-            fs.writeFileSync(this.config_filename, JSON.stringify(require('./default_config.json')));
-            this.config = require('./default_config.json');
-        }
+        this.config = JSON.parse(fs.readFileSync(this.config_filename));
 
         if (fs.existsSync(this.filename)) {
             this.users = JSON.parse(fs.readFileSync(this.filename));
@@ -32,7 +27,7 @@ class DB {
         });
 
         this.sheet = new GoogleSpreadsheet(this.config.sheets.sheet_id);
-        this.creds = require('./client_secret');
+        this.creds = this.config.sheets.creds;
 
         if (!this.isDev) {
             this.hardSyncSheets();
@@ -44,9 +39,10 @@ class DB {
     }
 
     populateRow(user, row) {
+        user = this.query(user);
         const formatTime = millis => (millis / 1000 / 60 / 60).toFixed(2);
 
-        row['Total Team Hours'] = formatTime(
+        row['Team Hours'] = formatTime(
             (user.imported_hours ? moment.duration(user.imported_hours, 'hours') : 0) +
                   this.getTotalTime(user.sessions)
         );
@@ -76,7 +72,7 @@ class DB {
                 if (err) return console.error(err);
 
                 for (let row of rows) {
-                    if (row.first === "" && row.last === "") break;
+                    if (row.first === '' && row.last === '') break;
                     this.populateRow(this.query({ name: `${ row.first } ${ row.last }` }), row);
                 }
             });
