@@ -23,11 +23,11 @@ export default class LastActionDisplay extends Component {
     componentDidMount() {
         const populateAdditionalFields = user => (Object.assign(
             Object.keys(DB.config.day_counters).reduce((acc, cur) => {
-                acc[cur] = DB.getTotalCertainDays(user, DB.config.day_counters[cur]);
+                acc[cur] = DB.getTotalDays(DB.filterSessions(user.sessions, DB.config.day_counters[cur]));
                 return acc;
             }, {}),
             Object.keys(DB.config.hour_counters).reduce((acc, cur) => {
-                acc[cur] = TimeTable.formatTime(DB.getTotalTimeInRange(user, ...DB.config.hour_counters[cur]));
+                acc[cur] = TimeTable.formatTime(DB.getTotalTime(DB.filterSessions(user.sessions, ...DB.config.hour_counters[cur])));
                 return acc;
             }, {})
         ));
@@ -36,7 +36,7 @@ export default class LastActionDisplay extends Component {
             name: user.name,
             action: 'IN',
             session_time: 'N/A',
-            total_time: DB.getTotalUserTime(user),
+            total_time: DB.getTotalTime(user.sessions),
             additional_fields: populateAdditionalFields(user)
         }));
 
@@ -44,7 +44,7 @@ export default class LastActionDisplay extends Component {
             name: user.name,
             action: 'OUT',
             session_time: moment(session.end).diff(session.start),
-            total_time: DB.getTotalUserTime(user),
+            total_time: DB.getTotalTime(user.sessions),
             additional_fields: populateAdditionalFields(user)
         }));
     }

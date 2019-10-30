@@ -120,9 +120,9 @@ class DB {
 
     filterSessions(sessions, filter) {
         if (typeof filter === 'string') {
-            return sessions.filter(session => session.start.weekday() === moment.weekdays().indexOf(filter));
+            return sessions.filter(session => moment(session.start).weekday() === moment.weekdays().indexOf(filter));
         } else if (Array.isArray(filter)) {
-            return sessions.filter(session => session.start.isBetween(moment(filter[0], moment(filter[1]))));
+            return sessions.filter(session => moment(session.start).isBetween(moment(filter[0]), moment(filter[1])));
         }
     }
 
