@@ -21,7 +21,7 @@ export default class AdminPanel extends Component {
 
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
-
+        this.toggleSignUps = this.toggleSignUps.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -29,8 +29,6 @@ export default class AdminPanel extends Component {
 
     componentWillMount() {
         const config = DB.config;
-
-        console.log(config.sign_ups);
 
         const format = key => Object.keys(config[key]).reduce((acc, cur) => {
             acc[cur] = false;
@@ -99,7 +97,7 @@ export default class AdminPanel extends Component {
 
     handleSubmit() {
         if (Object.values({...this.state.config.hour_counters, ...this.state.config.day_counters}).every(
-            counter => counter.constructor === Array ? counter.every(date => moment(date).isValid()) : moment().isoWeekday(counter).isValid())) {
+            counter => counter.constructor === Array ? counter.every(date => moment(date).isValid()) : typeof counter === "number")) {
             this.writeToFile();
         } else {
             return false;
@@ -180,7 +178,7 @@ export default class AdminPanel extends Component {
                     <br/>
                     <Button
                         className="offButton"
-                        onClick={this.toggleSignUps.bind(this)}
+                        onClick={this.toggleSignUps}
                         color={this.state.config.sign_ups ? "success" : "warning"}
                     >Sign Ups</Button>
                     <br/>
