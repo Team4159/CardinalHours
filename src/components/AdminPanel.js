@@ -73,7 +73,7 @@ export default class AdminPanel extends Component {
         })
     }
 
-    toggleAddStudents() {
+    toggleSignUps() {
         let obj = {
             sign_ups: !this.state.config.sign_ups,
         };
@@ -142,7 +142,9 @@ export default class AdminPanel extends Component {
                     <form onSubmit={this.handleSubmit}>
                         {
                             Object.keys(this.state.config.hour_counters).map((counter, idx) => (
-                                [<Button onClick={() => this.handleClick("hour_counters", counter)}>{counter}</Button>,
+                                [<Button onClick={() => this.handleClick("hour_counters", counter)}>
+                                    {counter}
+                                </Button>,
                                     <br key={idx}/>,
                                     this.state.hour_counters[counter] ? <div key={idx + this.state.config.hour_counters.length}>
                                         <Input
@@ -163,7 +165,9 @@ export default class AdminPanel extends Component {
 
                         {
                             Object.keys(this.state.config.day_counters).map((counter, idx) => (
-                                [<Button onClick={() => this.handleClick("hour_counters", counter)}>{counter}</Button>,
+                                [<Button onClick={() => this.handleClick("hour_counters", counter)}>
+                                    {counter}
+                                </Button>,
                                     <br key={idx}/>,
                                     this.state.hour_counters[counter] ? <div key={idx + this.state.config.hour_counters.length}>
                                         <Input
@@ -172,7 +176,7 @@ export default class AdminPanel extends Component {
                                             onChange={event => this.handleChange(event, "day_counters", counter)}
                                         />
                                         <p>
-                                            { moment().isoWeekday(this.state.config.day_counters[counter]).format("dddd") }
+                                            {moment().isoWeekday(this.state.config.day_counters[counter]).format("dddd")}
                                         </p>
                                     </div> : null]
                             ))
@@ -185,7 +189,7 @@ export default class AdminPanel extends Component {
                     <br/>
                     <Button
                         className="offButton"
-                        onClick={this.toggleAddStudents.bind(this)}
+                        onClick={this.toggleSignUps.bind(this)}
                         color={this.state.config.sign_ups ? "success" : "warning"}
                     >Sign Ups</Button>
                     <br/>
