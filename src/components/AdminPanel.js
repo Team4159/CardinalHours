@@ -79,7 +79,9 @@ export default class AdminPanel extends Component {
     }
 
     handleChange(event, type, counter, pos) {
-        let obj = {[type]: {}};
+        let obj = {
+            [type]: {}
+        };
 
         if (pos === undefined) {
             obj[type][counter] = parseInt(event.target.value) || 0;
@@ -96,7 +98,7 @@ export default class AdminPanel extends Component {
         })
     }
 
-    handleSubmit(event) {
+    handleSubmit() {
         if (Object.values({...this.state.config.hour_counters, ...this.state.config.day_counters}).every(
             counter => counter.constructor === Array ? counter.every(date => moment(date).isValid()) : moment().isoWeekday(counter).isValid())) {
             this.writeToFile();
@@ -113,7 +115,6 @@ export default class AdminPanel extends Component {
     dropUser(user){
         const dropper = DB.query({user});
     }
-
 
     render() {
         return (
@@ -178,10 +179,7 @@ export default class AdminPanel extends Component {
                         className='memberTable'
                     >Drop members
                     </Button>
-                    <div></div>
-                    <div></div>
                     <div>Add new users</div>
-                    <div></div>
                     <Button
                         className="offButton"
                         onClick={this.toggleAddStudents.bind(this)}
@@ -190,7 +188,6 @@ export default class AdminPanel extends Component {
                         }}
 
                     >{!this.state.addStudents ? "On" : "Off"}</Button>
-                    <div></div>
                     <Button
                         onClick={this.handleCloseModal}
                     >Close</Button>
