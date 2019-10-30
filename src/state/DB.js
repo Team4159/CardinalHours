@@ -118,7 +118,7 @@ class DB {
 
     getTotalCertainDays(user, day) {
         user = this.query(user);
-        return (day === 5 && user.imported_meetings ? user.imported_meetings : 0) + this.getTotalDays(user.sessions.filter(session => moment(session.start).isoWeekday === day));
+        return (day === 5 && user.imported_meetings ? user.imported_meetings : 0) + this.getTotalDays(user.sessions.filter(session => moment(session.start).isoWeekday() == day));
     }
 }
 

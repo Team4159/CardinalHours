@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {Button, Input} from 'reactstrap';
 import ReactModal from "react-modal";
 import DB from '../state/DB'
-//import config from '../state/config.json';
 import moment from "moment";
 import fs from 'fs';
 
+const source = DB.config_filename;
 
 export default class AdminPanel extends Component {
     constructor(props) {
@@ -22,40 +22,43 @@ export default class AdminPanel extends Component {
         this.handleCloseModal = this.handleCloseModal.bind(this);
 
         this.handleHourCounter = this.handleHourCounter.bind(this);
+        this.handleDayCounter = this.handleDayCounter.bind(this);
         this.handleClick = this.handleClick.bind(this);
-        this.setDate = this.setDate.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     componentWillMount() {
         const config = DB.config;
+
+        console.log(config);
 
         const format = key => Object.keys(config[key]).reduce((acc, cur) => {
             acc[cur] = false;
             return acc;
         }, {});
 
-        let hourCounters = format("hour_counters");
-        let dayCounters = format("day_counters");
+        let hour_counters = format("hour_counters");
+        let day_counters = format("day_counters");
 
         this.setState({
             config: config,
-            hour_counters: hourCounters,
-            day_counters: dayCounters
+            hour_counters: hour_counters,
+            day_counters: day_counters
         });
     }
 
     handleOpenModal() {
-        this.setState({ showModal: true });
+        this.setState({showModal: true});
     }
 
     handleCloseModal() {
-        this.setState({ showModal: false });
+        this.setState({showModal: false});
     }
 
     handleClick(counter, key) {
         let obj = {};
 
-        if (counter) {
+        if (counter === "hour_counters") {
             obj[key] = !this.state.hour_counters[key];
 
             this.setState({
@@ -64,7 +67,7 @@ export default class AdminPanel extends Component {
                     ...obj
                 }
             })
-        } else {
+        } else if (counter === "day_counters") {
             obj[key] = !this.state.day_counters[key];
 
             this.setState({
@@ -76,27 +79,43 @@ export default class AdminPanel extends Component {
         }
     }
 
-    handleHourCounter(event, key) {
-        //console.log(key + ": " + event);
+    handleHourCounter(event, counter, pos) {
+        let obj = { hour_counters: {} };
+
+        obj.hour_counters[counter] = [...this.state.config.hour_counters[counter]];
+        obj.hour_counters[counter][pos] = event.target.value;
+
+        this.setState({
+            config: {
+                ...this.state.config,
+                ...obj
+            }
+        });
     }
 
-    setDate(event) {
-        /**event.preventDefault();
+    handleDayCounter(event, counter) {
+        let obj = { day_counters: {} };
 
-        let start = moment(this.state.startDate).format('YYYY-MM-DD');
-        let end = moment(this.state.endDate).format('YYYY-MM-DD');
+        obj.day_counters[counter] = parseInt(event.target.value) || 0;
 
-        if (start === "Invalid date" || end === "Invalid date") return false;
-
-        let config = this.state.config;
-        //config.hour_counters[this.state.period][0] = start;
-        //config.hour_counters[this.state.period][1] = end;
-
-        this.writeToFile(config);**/
+        this.setState({
+            config: {
+                ...this.state.config,
+                ...obj
+            }
+        })
     }
 
-    writeToFile(newConfig) {
-        this.setState({config: newConfig});
+    handleSubmit(event) {
+        if (Object.values({...this.state.config.hour_counters, ...this.state.config.day_counters}).every(
+            counter => counter.constructor === Array ? counter.every(date => moment(date).isValid()) : moment().isoWeekday(counter).isValid())) {
+            this.writeToFile();
+        } else {
+            return false;
+        }
+    }
+
+    writeToFile() {
         fs.writeFile(source, JSON.stringify(this.state.config), err => err ? console.error(err) : null);
     }
 
@@ -108,75 +127,61 @@ export default class AdminPanel extends Component {
                     isOpen={this.state.showModal}
                     ariaHideApp={false}
                     contentLabel="Admin Panel"
-                    style = {{
+                    style={{
                         content: {
-                            height : '50%',
-                            width  : '50%',
-                            margin : '0 auto',
+                            height: '50%',
+                            width: '50%',
+                            margin: '0 auto',
                         }
                     }}
                 >
-                    {
-                        Object.keys(this.state.config.hour_counters).map((key, idx) => (
-                            [<Button onClick={() => this.handleClick("hour_counters", key)}>{key}</Button>, <br key={idx}/>]
-                        ))
-                    }
+                    <form onSubmit={this.handleSubmit}>
+                        {
+                            Object.keys(this.state.config.hour_counters).map((key, idx) => (
+                                [<Button onClick={() => this.handleClick("hour_counters", key)}>{key}</Button>,
+                                    <br key={idx}/>,
+                                    this.state.hour_counters[key] ? <div key={idx + this.state.config.hour_counters.length}>
+                                        <Input
+                                            name="start_date"
+                                            placeholder={key + " start date"}
+                                            value={this.state.config.hour_counters[key][0]}
+                                            onChange={event => this.handleHourCounter(event, key, 0)}
+                                        />
+                                        <Input
+                                            name="start_date"
+                                            placeholder={key + " end date"}
+                                            value={this.state.config.hour_counters[key][1]}
+                                            onChange={event => this.handleHourCounter(event, key, 1)}
+                                        />
+                                    </div> : null]
+                            ))
+                        }
 
-                    {
-                        Object.keys(this.state.config.day_counters).map((key, idx) => (
-                            [<Button onClick={key => this.handleClick("day_counters", key)}>{key}</Button>, <br key={idx + this.state.config.hour_counters.length}/>]
-                        ))
-                    }
-
-                    {
-                        Object.keys(this.state.config.hour_counters).filter(key => this.state.hour_counters[key]).map((key, idx) => (
-                            <div key={idx}>
-                                <form onSubmit={this.setDate}>
-                                    <Input
-                                        name="start_date"
-                                        placeholder={key + " start date"}
-                                        value={this.state.config.hour_counters[key][0]}
-                                        onChange={key => this.handleHourCounter(event, key)}
-                                    />
-                                    <Input
-                                        name="start_date"
-                                        placeholder={key + " end date"}
-                                        value ={this.state.config.hour_counters[key][1]}
-                                        onChange={key => this.handleHourCounter(event, key)}
-                                    />
-                                    <Button
-                                        onClick={this.setDate}
-                                        type='submit'
-                                    >Submit</Button>
-                                </form>
-                            </div>))
-                    }
-
-                    {/**
-                        this.state.showSetDate ?
-                            <div> <form onSubmit={this.setDate}>
-                                <Input
-                                    name='startDate'
-                                    placeholder='Enter build season start date'
-                                    value = {this.state.startDate}
-                                    onChange = {this.handleChange}
-                                />
-                                <Input
-                                    name='endDate'
-                                    placeholder='Enter build season end date'
-                                    value = {this.state.endDate}
-                                    onChange = {this.handleChange}
-                                />
-                                <Button
-                                    onClick={this.setDate}
-                                    type='submit'
-                                >Enter</Button> </form>
-                            </div>
-                        : null **/
-                    }
-                    <button
+                        {
+                            Object.keys(this.state.config.day_counters).map((key, idx) => (
+                                [<Button onClick={() => this.handleClick("hour_counters", key)}>{key}</Button>,
+                                    <br key={idx}/>,
+                                    this.state.hour_counters[key] ? <div key={idx + this.state.config.hour_counters.length}>
+                                        <Input
+                                            placeholder={"Day of " + key}
+                                            value={this.state.config.day_counters[key]}
+                                            onChange={event => this.handleDayCounter(event, key)}
+                                        />
+                                        <p>
+                                            {
+                                                moment().isoWeekday(this.state.config.day_counters[key]).format("dddd")
+                                            }
+                                        </p>
+                                    </div> : null]
+                            ))
+                        }
+                        <Button
+                            type='submit'
+                        >Submit</Button>
+                    </form>
+                    <Button
                         onClick={this.handleCloseModal}
-                    >Close</button>
+                    >Close</Button>
                 </ReactModal>
             </div>
         );
