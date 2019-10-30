@@ -17,7 +17,7 @@ export default class AdminPanel extends Component {
             hour_counters: {},
             day_counters: {},
             showModal: false,
-            addStudents: DB.config.sign_ups,
+            addStudents: true
         };
 
         this.handleOpenModal = this.handleOpenModal.bind(this);
@@ -31,6 +31,8 @@ export default class AdminPanel extends Component {
     componentWillMount() {
         const config = DB.config;
 
+        console.log(config.sign_ups);
+
         const format = key => Object.keys(config[key]).reduce((acc, cur) => {
             acc[cur] = false;
             return acc;
@@ -42,7 +44,7 @@ export default class AdminPanel extends Component {
         this.setState({
             config: config,
             hour_counters: hour_counters,
-            day_counters: day_counters
+            day_counters: day_counters,
         });
     }
 
@@ -71,11 +73,17 @@ export default class AdminPanel extends Component {
         })
     }
 
-    toggleAddStudents(){
-        this.setState({addStudents: !this.state.addStudents})
-        DB.config.sign_ups = this.state.addStudents;
-        fs.writeFile(source, JSON.stringify(DB.config), (err) =>{if(err) return console.log(err)});
-        console.log(DB.config);
+    toggleAddStudents() {
+        let obj = {
+            sign_ups: !this.state.config.sign_ups,
+        };
+
+        this.setState({
+            config: {
+                ...this.state.config,
+                ...obj,
+            }
+        });
     }
 
     handleChange(event, type, counter, pos) {
@@ -109,7 +117,6 @@ export default class AdminPanel extends Component {
 
     writeToFile() {
         fs.writeFile(source, JSON.stringify(this.state.config), err => err ? console.error(err) : null);
-
     }
 
     dropUser(user){
@@ -170,31 +177,27 @@ export default class AdminPanel extends Component {
                                     </div> : null]
                             ))
                         }
-                        <Button
-                            type='submit'
-                        >Submit</Button>
-                    </form>
                     <Button
                         onClick={this}
                         className='memberTable'
                     >Drop members
                     </Button>
-                    <div>Add new users</div>
+                    <br/>
                     <Button
                         className="offButton"
                         onClick={this.toggleAddStudents.bind(this)}
-                        style = {{
-                                color: !this.state.addStudents ? "green" : "red"
-                        }}
-
-                    >{!this.state.addStudents ? "On" : "Off"}</Button>
+                        color={this.state.config.sign_ups ? "success" : "warning"}
+                    >Sign Ups</Button>
+                    <br/>
+                    <Button
+                        type='submit'
+                    >Submit</Button>
+                    </form>
+                    <br/>
                     <Button
                         onClick={this.handleCloseModal}
                     >Close</Button>
                 </ReactModal>
-                {DB.config.sign_ups ? <Row style={ { height: '25%' } }>
-                        <UserDisplay/>
-                    </Row> : null }
             </div>
         );
     }
