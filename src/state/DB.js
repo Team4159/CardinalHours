@@ -28,66 +28,94 @@ class DB {
 
         this.sheet = new GoogleSpreadsheet(this.config.sheets.sheet_id);
         this.creds = this.config.sheets.creds;
-
-        if (!this.isDev) {
-            this.hardSyncSheets();
-        }
+        this.checkAuth(() => {
+            if (!this.isDev) {
+                this.syncSheets();
+            }
+        });
     }
 
     updateFile() {
         fs.writeFileSync(this.filename, JSON.stringify(this.users));
     }
 
-    populateRow(user, row) {
+    populateRow(user, headers, row) {
         user = this.query(user);
         const formatTime = millis => (millis / 1000 / 60 / 60).toFixed(2);
+        const getColumn = header_ => headers.findIndex(header => header.value === header_);
 
-        row['Team Hours'] = formatTime(
+        row[getColumn('Team Hours')].value = formatTime(
             (user.imported_hours ? moment.duration(user.imported_hours, 'hours') : 0) +
-                  this.getTotalTime(user.sessions)
+            this.getTotalTime(user.sessions)
         );
 
         for (let day_counter of Object.keys(this.config.day_counters)) {
             let filter = this.config.day_counters[day_counter];
-            row[day_counter] = (filter === 'Friday' && user.imported_meetings ? user.imported_meetings : 0) +
-                               this.getTotalDays(this.filterSessions(user.sessions, filter));
+            row[getColumn(day_counter)].value = (filter === 'Friday' && user.imported_meetings ? user.imported_meetings : 0) +
+                this.getTotalDays(this.filterSessions(user.sessions, filter));
         }
 
         for (let hour_counter of Object.keys(this.config.hour_counters)) {
             let filter = this.config.hour_counters[hour_counter];
-            row[hour_counter] = formatTime(this.getTotalTime(this.filterSessions(user.sessions, filter)));
+            row[getColumn(hour_counter)].value = formatTime(this.getTotalTime(this.filterSessions(user.sessions, filter)));
         }
 
-        row.save(err => {
-            if (err) {
-                setTimeout(() => this.populateRow(user, row), 1000);
-            }
-        });
+        return row;
     }
 
-    hardSyncSheets() {
-        this.sheet.useServiceAccountAuth(this.creds, err => {
-            if (err) return console.error(err);
-            this.sheet.getRows(this.config.sheets.worksheet_id, (err, rows) => {
-                if (err) return console.error(err);
+    checkAuth(cb) {
+        if (!this.sheet.isAuthActive()) {
+            this.sheet.useServiceAccountAuth(this.creds, err => {
+                if (err) cb(err);
+                this.sheet.getInfo((err, info) => {
+                    if (err) cb(err);
+                    this.worksheet = info.worksheets[this.config.sheets.worksheet_id - 1];
+                    cb(null);
+                });
+            });
+        } else {
+            cb(null);
+        }
+    }
 
-                for (let row of rows) {
-                    if (row.first === '' && row.last === '') break;
-                    this.populateRow(this.query({ name: `${ row.first } ${ row.last }` }), row);
+    getCells(cb) {
+        this.checkAuth(err => {
+            if (err) cb(err);
+            this.worksheet.getCells({
+                'return-empty': true
+            }, (err, cells) => {
+                if (err) cb(err);
+
+                let rowSize = 0;
+                for (let cell of cells) {
+                    if (cell.col > rowSize) {
+                        rowSize = cell.col;
+                    } else {
+                        break;
+                    }
                 }
+
+                let headers = cells.slice(0, rowSize);
+
+                cb(null, [headers, cells]);
             });
         });
     }
 
-    updateSheets(user) {
-        this.sheet.useServiceAccountAuth(this.creds, err => {
+    syncSheets() {
+        this.getCells((err, [headers, cells]) => {
             if (err) return console.error(err);
-            this.sheet.getRows(this.config.sheets.worksheet_id, (err, rows) => {
-                if (err) return console.error(err);
 
-                let row = rows.find(row =>  `${ row.first } ${ row.last }` === user.name);
-                this.populateRow(user, row);
-            });
+            for (let i = headers.length; i < cells.length - headers.length; i += headers.length) {
+                let row = cells.slice(i, i + headers.length);
+                if (row[headers.findIndex(header => header.value === 'First')].value === '' && row[headers.findIndex(header => header.value === 'Last')].value === '') {
+                    break;
+                }
+                let user = this.query({name: `${ row[headers.findIndex(header => header.value === 'First')].value } ${ row[headers.findIndex(header => header.value === 'Last')].value }`});
+                cells = cells.slice(0, i).concat(this.populateRow(user, headers, row)).concat(cells.slice(i + headers.length));
+            }
+
+            this.worksheet.bulkUpdateCells(cells);
         });
     }
 
@@ -109,7 +137,7 @@ class DB {
         this.query(user).sessions.push(session);
 
         if (!this.isDev) {
-            this.updateSheets(user);
+            this.syncSheets(user);
         }
         this.updateFile();
     }
