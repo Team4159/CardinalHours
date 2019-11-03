@@ -67,15 +67,6 @@ export default class AdminPanel extends Component {
         });
     }
 
-    handleClick(type, counter) {
-        this.setState({
-            [type]: {
-                ...this.state[type],
-                [counter]: !this.state[type][counter]
-            }
-        })
-    }
-
     toggleSignUps() {
         this.setState({
             config: {
@@ -83,6 +74,20 @@ export default class AdminPanel extends Component {
                 sign_ups: !this.state.config.sign_ups,
             }
         });
+    }
+
+    isConfigValid() {
+        return Object.values({...this.state.config.hour_counters, ...this.state.config.day_counters}).every(
+            counter => counter.constructor === Array ? counter.every(date => moment(date).isValid()) : typeof counter === "number")
+    }
+
+    handleClick(type, counter) {
+        this.setState({
+            [type]: {
+                ...this.state[type],
+                [counter]: !this.state[type][counter]
+            }
+        })
     }
 
     handleChange(event, type, counter, pos) {
@@ -111,11 +116,6 @@ export default class AdminPanel extends Component {
         } else {
             event.preventDefault();
         }
-    }
-
-    isConfigValid() {
-        return Object.values({...this.state.config.hour_counters, ...this.state.config.day_counters}).every(
-            counter => counter.constructor === Array ? counter.every(date => moment(date).isValid()) : typeof counter === "number")
     }
 
     writeToFile() {
