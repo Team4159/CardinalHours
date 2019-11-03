@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
-import {Button, Input, Row} from 'reactstrap';
+import {Button, Input, Badge } from 'reactstrap';
 import ReactModal from "react-modal";
 import DB from '../state/DB'
-import UserDisplay from './UserDisplay';
 import moment from "moment";
 import fs from 'fs';
 
@@ -216,7 +215,10 @@ export default class AdminPanel extends Component {
                                 className="offButton"
                                 onClick={this.toggleSignUps}
                                 color={this.state.config.sign_ups ? "primary" : "secondary"}
-                            >Sign Ups {this.state.config.sign_ups ? "Enabled" : "Disabled"}</Button>
+                            >Sign Ups {this.state.config.sign_ups ?
+                                <Badge color="success" pill>Enabled</Badge>
+                                :<Badge color="dark" pill>Disabled</Badge>}
+                            </Button>
                         </div>
                         <hr/>
                         <Button
