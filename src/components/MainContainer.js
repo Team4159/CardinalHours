@@ -20,11 +20,13 @@ export default class MainContainer extends Component {
                 <h1 className='Header'>CardinalHours</h1>
                 <Row>
                     <Col>
-                        <AdminPanel/>
+                        <Row Row style={ { height: '10%' } }>
+                            <AdminPanel/>
+                        </Row>
                         { DB.config.sign_ups ? <Row style={ { height: '25%' } }>
                             <UserDisplay/>
                         </Row> : null }
-                        <Row style={ { height: '75%' } }>
+                        <Row style={ { height: '65%' } }>
                             <LastActionDisplay/>
                         </Row>
                     </Col>
