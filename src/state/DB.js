@@ -106,12 +106,14 @@ class DB {
         this.getCells((err, [headers, cells]) => {
             if (err) return console.error(err);
 
+            const getColumn = header_ => headers.findIndex(header => header.value === header_);
+
             for (let i = headers.length; i < cells.length - headers.length; i += headers.length) {
                 let row = cells.slice(i, i + headers.length);
-                if (row[headers.findIndex(header => header.value === 'First')].value === '' && row[headers.findIndex(header => header.value === 'Last')].value === '') {
+                if (row[getColumn('First')].value === '' && row[getColumn('Last')].value === '') {
                     break;
                 }
-                let user = this.query({name: `${ row[headers.findIndex(header => header.value === 'First')].value } ${ row[headers.findIndex(header => header.value === 'Last')].value }`});
+                let user = this.query({name: `${ row[getColumn('First')].value } ${ row[getColumn('Last')].value }`});
                 cells = cells.slice(0, i).concat(this.populateRow(user, headers, row)).concat(cells.slice(i + headers.length));
             }
 
@@ -161,7 +163,7 @@ class DB {
     }
 
     getTotalDays(sessions) {
-        return sessions.filter((session, index) => index === 0 || !moment(session.start).isSame(moment(sessions[index - 1]), 'day')).length;
+        return sessions.filter((session, index) => index === 0 || !moment(session.start).isSame(moment(sessions[index - 1].start), 'day')).length;
     }
 }
 
