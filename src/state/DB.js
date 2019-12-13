@@ -3,10 +3,13 @@ import path from 'path';
 
 import moment from 'moment';
 import GoogleSpreadsheet from 'google-spreadsheet';
+import log from 'electron-log';
 import { remote } from 'electron';
 
 class DB {
     constructor() {
+        log.info('Initializing database...');
+
         this.filename = path.join(remote.getGlobal('dataPath'), 'users.json');
         this.fsWait = false;
 
@@ -28,7 +31,8 @@ class DB {
 
         this.sheet = new GoogleSpreadsheet(this.config.sheets.sheet_id);
         this.creds = this.config.sheets.creds;
-        this.checkAuth(() => {
+        this.checkAuth(err => {
+            if (err) return log.error('Failed to refresh authentication: ' + err);
             if (!this.isDev) {
                 this.syncSheets();
             }
@@ -36,6 +40,7 @@ class DB {
     }
 
     updateFile() {
+        log.info('Updating users file...');
         fs.writeFileSync(this.filename, JSON.stringify(this.users));
     }
 
@@ -64,6 +69,7 @@ class DB {
     }
 
     checkAuth(cb) {
+        log.info('Refreshing authentication...');
         if (!this.sheet.isAuthActive()) {
             this.sheet.useServiceAccountAuth(this.creds, err => {
                 if (err) cb(err);
@@ -103,6 +109,7 @@ class DB {
     }
 
     syncSheets() {
+        log.info('Syncing Google Sheets...');
         this.getCells((err, [headers, cells]) => {
             if (err) return console.error(err);
 
@@ -122,6 +129,7 @@ class DB {
     }
 
     addUser(user) {
+        log.info('Adding user: ' + user.name);
         if (this.query({id: user.id})) return false;
 
         this.users.push({
@@ -136,6 +144,7 @@ class DB {
     }
 
     addSession(user, session) {
+        log.info('Adding session for ' + user.name);
         this.query(user).sessions.push(session);
 
         if (!this.isDev) {
