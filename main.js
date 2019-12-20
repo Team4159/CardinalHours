@@ -71,6 +71,7 @@ function createWindow() {
 }
 
 global.dataPath = app.getPath('userData');
+global.isDev = false;
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

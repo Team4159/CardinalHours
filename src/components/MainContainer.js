@@ -23,7 +23,7 @@ export default class MainContainer extends Component {
                         { DB.config.sign_ups ? <Row style={ { height: '25%' } }>
                             <UserDisplay/>
                         </Row> : null }
-                        <Row style={ { height: '75%' } }>
+                        <Row style={ { minHeight: '75%' } }>
                             <LastActionDisplay/>
                         </Row>
                     </Col>
