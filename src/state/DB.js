@@ -35,6 +35,11 @@ class DB {
         });
     }
 
+    writeToFile(config) {
+        this.config = config;
+        fs.writeFileSync(this.config_filename, JSON.stringify(  config), err => err ? console.error(err) : null );
+    }
+
     updateFile() {
         fs.writeFileSync(this.filename, JSON.stringify(this.users));
     }
