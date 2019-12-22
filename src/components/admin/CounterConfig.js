@@ -9,7 +9,7 @@ export default class CounterConfig extends Component {
         super(props);
 
         this.state = ({
-            config: {},
+            config: DB.config,
             hour_counters: {},
             day_counters: {}
         });
@@ -140,7 +140,7 @@ export default class CounterConfig extends Component {
                     type='submit'
                     color={this.isConfigValid() ? "success" : "danger"}
                     onClick={this.handleSubmit}
-                >Confirm</Button>
+                >Save Changes</Button>
             </div>
         )
     }

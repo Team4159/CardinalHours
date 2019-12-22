@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import DB from "../../state/DB";
-import moment from "moment";
-import {Badge, Button, Input} from "reactstrap";
+import {Badge, Button} from "reactstrap";
 
 export default class MiscConfig extends Component {
     constructor(props) {

@@ -40,6 +40,10 @@ class DB {
         fs.writeFileSync(this.config_filename, JSON.stringify(  config), err => err ? console.error(err) : null );
     }
 
+    setUsers(users) {
+        this.users = users;
+    }
+
     updateFile() {
         fs.writeFileSync(this.filename, JSON.stringify(this.users));
     }

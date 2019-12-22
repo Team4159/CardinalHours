@@ -5,6 +5,7 @@ import DB from '../state/DB'
 import fs from 'fs';
 import CounterConfig from "./admin/CounterConfig";
 import MiscConfig from "./admin/MiscConfig";
+import UserConfig from "./admin/UserConfig";
 
 const source = DB.config_filename;
 
@@ -43,7 +44,7 @@ export default class AdminPanel extends Component {
     handlePagination(event, pagination) {
         this.setState({
             pagination: pagination
-        })
+        });
     }
 
     writeToFile() {
@@ -60,29 +61,34 @@ export default class AdminPanel extends Component {
                     contentLabel="Admin Panel"
                     style={{
                         content: {
-                            height: '50%',
-                            width: '50%',
+                            height: '90%',
+                            width: '90%',
                             margin: '0 auto',
                         }
                     }}
                 >
-                    <Pagination>
+                    <Pagination size="sm">
                         <PaginationItem active={this.state.pagination === "COUNTER"}>
                             <PaginationLink href='#' onClick={event => this.handlePagination(event, "COUNTER")}>
-                                Counters
+                                Counter Configuration
+                            </PaginationLink>
+                        </PaginationItem>
+                        <PaginationItem active={this.state.pagination === "USERS"}>
+                            <PaginationLink href='#' onClick={event => this.handlePagination(event, "USERS")}>
+                                User Configuration
                             </PaginationLink>
                         </PaginationItem>
                         <PaginationItem active={this.state.pagination === "MISC"}>
                             <PaginationLink href='#' onClick={event => this.handlePagination(event, "MISC")}>
-                                Misc. Options
+                                Miscellaneous Options
                             </PaginationLink>
                         </PaginationItem>
                     </Pagination>
                     <div>
                         {
                             this.state.pagination === "COUNTER" ? <CounterConfig/> :
+                            this.state.pagination === "USERS" ? <UserConfig/> :
                             this.state.pagination === "MISC" ? <MiscConfig refresh={this.props.refresh}/> : null
-                            //TODO: Users
                         }
                     </div>
                     <br/>
