@@ -12,6 +12,11 @@ export default class MainContainer extends Component {
     constructor(props) {
         super(props);
 
+        this.refreshMainContainer = this.refreshMainContainer.bind(this);
+    }
+
+    refreshMainContainer() {
+        this.forceUpdate();
     }
 
     render() {
@@ -20,8 +25,8 @@ export default class MainContainer extends Component {
                 <h1 className='Header'>CardinalHours</h1>
                 <Row>
                     <Col>
-                        <Row Row style={ { height: '10%' } }>
-                            <AdminPanel/>
+                        <Row style={ { height: '10%' } }>
+                            <AdminPanel refresh={this.refreshMainContainer}/>
                         </Row>
                         { DB.config.sign_ups ? <Row style={ { height: '25%' } }>
                             <UserDisplay/>

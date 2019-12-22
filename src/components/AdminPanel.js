@@ -81,7 +81,7 @@ export default class AdminPanel extends Component {
                     <div>
                         {
                             this.state.pagination === "COUNTER" ? <CounterConfig/> :
-                            this.state.pagination === "MISC" ? <MiscConfig/> : null
+                            this.state.pagination === "MISC" ? <MiscConfig refresh={this.props.refresh}/> : null
                             //TODO: Users
                         }
                     </div>

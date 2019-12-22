@@ -11,10 +11,8 @@ export default class MiscConfig extends Component {
     }
 
     toggleSignUps() {
-        //TODO: Update UserDisplay.js
-
         DB.writeToFile({...DB.config, ...{"sign_ups": !DB.config.sign_ups}});
-        this.forceUpdate();
+        this.props.refresh();
     }
 
     render() {
