@@ -82,8 +82,6 @@ export default class UserConfig extends Component {
         } else {
             console.error("User not found:" + user)
         }
-
-        console.log(user);
     }
 
     render() {
@@ -118,7 +116,7 @@ export default class UserConfig extends Component {
                         </div> : null
                 }
                 <br/>
-                <Button color={this.state.users !== DB.users ? "success" : "secondary"} onClick={this.handleSaveAllChanges}>Confirm All Changes</Button>
+                <Button color="success" onClick={this.handleSaveAllChanges}>Confirm All Changes</Button>
             </div>
         )
     }

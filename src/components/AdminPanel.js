@@ -2,18 +2,18 @@ import React, {Component} from 'react';
 import { Button, Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import ReactModal from "react-modal";
 import DB from '../state/DB'
-import fs from 'fs';
 import CounterConfig from "./admin/CounterConfig";
 import MiscConfig from "./admin/MiscConfig";
 import UserConfig from "./admin/UserConfig";
 
-const source = DB.config_filename;
+const hash = require('password-hash');
 
 export default class AdminPanel extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
+            unlocked: false,
             showModal: false,
             pagination: "COUNTER",
         };
@@ -22,6 +22,8 @@ export default class AdminPanel extends Component {
         this.handleCloseModal = this.handleCloseModal.bind(this);
         this.resetConfig = this.resetConfig.bind(this);
         this.handlePagination = this.handlePagination.bind(this);
+
+        console.log(hash.generate('rishikainathan7'));
     }
 
     resetConfig() {
@@ -45,10 +47,6 @@ export default class AdminPanel extends Component {
         this.setState({
             pagination: pagination
         });
-    }
-
-    writeToFile() {
-        fs.writeFile(source, JSON.stringify(this.state.config), err => err ? console.error(err) : null);
     }
 
     render() {

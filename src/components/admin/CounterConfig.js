@@ -9,7 +9,6 @@ export default class CounterConfig extends Component {
         super(props);
 
         this.state = ({
-            config: DB.config,
             hour_counters: {},
             day_counters: {}
         });
@@ -122,6 +121,22 @@ export default class CounterConfig extends Component {
                             </Button>,
                                 <br key={idx}/>,
                                 this.state.hour_counters[counter] ?
+                                    this.state.config.day_counters[counter] > 1 ?
+                                        <div key={idx + this.state.config.hour_counters.length}>
+                                            <Input
+                                                name="start_date"
+                                                placeholder={counter + " start date"}
+                                                value={this.state.config.day_counters[counter][0]}
+                                                onChange={event => this.handleChange(event, "day_counters", counter, 0)}
+                                            />
+                                            <Input
+                                                name="start_date"
+                                                placeholder={counter + " end date"}
+                                                value={this.state.config.day_counters[counter][1]}
+                                                onChange={event => this.handleChange(event, "day_counters", counter, 1)}
+                                            />
+                                        </div>
+                                        :
                                     <div key={idx + this.state.config.hour_counters.length}>
                                         <Input
                                             placeholder={"Day of " + counter}
