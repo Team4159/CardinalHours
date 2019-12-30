@@ -28,6 +28,7 @@ export default class LastActionDisplay extends Component {
             }, {}),
             Object.keys(DB.config.hour_counters).reduce((acc, cur) => {
                 acc[cur] = TimeTable.formatTime(DB.getTotalTimeInRange(user, ...DB.config.hour_counters[cur]));
+
                 return acc;
             }, {})
         ));

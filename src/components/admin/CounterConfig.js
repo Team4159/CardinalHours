@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import DB from "../../state/DB";
 import moment from "moment";
 import {Button, Input} from "reactstrap";
-import ReactModal from "../AdminPanel";
 
 export default class CounterConfig extends Component {
     constructor(props) {
@@ -86,6 +85,7 @@ export default class CounterConfig extends Component {
                     {
                         Object.keys(this.state.config.hour_counters).map((counter, idx) => (
                             [<Button
+                                key={idx}
                                 outline
                                 color="primary"
                                 onClick={() => this.handleClick("hour_counters", counter)}>
@@ -114,14 +114,15 @@ export default class CounterConfig extends Component {
                 <div>
                     {
                         Object.keys(this.state.config.day_counters).map((counter, idx) => (
-                            [<Button outline
+                            [<Button key={idx + this.state.config.hour_counters.length}
+                                     outline
                                      color="primary"
                                      onClick={() => this.handleClick("hour_counters", counter)}>
                                 {counter}
                             </Button>,
-                                <br key={idx}/>,
+                                <br key={idx + this.state.config.hour_counters.length}/>,
                                 this.state.hour_counters[counter] ?
-                                    this.state.config.day_counters[counter] > 1 ?
+                                    this.state.config.day_counters[counter].length > 1 ?
                                         <div key={idx + this.state.config.hour_counters.length}>
                                             <Input
                                                 name="start_date"
@@ -144,7 +145,7 @@ export default class CounterConfig extends Component {
                                             onChange={event => this.handleChange(event, "day_counters", counter)}
                                         />
                                         <p>
-                                            {moment().isoWeekday(this.state.config.day_counters[counter]).format("dddd")}
+                                            {/**moment().isoWeekday(this.state.config.day_counters[counter]).format("dddd")**/}
                                         </p>
                                     </div> : null]
                         ))
