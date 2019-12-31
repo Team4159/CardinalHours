@@ -56,16 +56,16 @@ export default class CounterConfig extends Component {
         })
     }
 
-    handleChange(event, type, counter, pos) {
+    handleChange(event, counter_type, index) {
         let obj = {
-            [type]: {}
+            [counter_type]: this.state.config[counter_type]
         };
 
-        if (pos === undefined) {
-            obj[type][counter] = parseInt(event.target.value) || 0;
+        if (index === undefined) {
+            obj[counter_type][event.target.name] = parseInt(event.target.value) || 0;
         } else {
-            obj[type][counter] = [...this.state.config[type][counter]];
-            obj[type][counter][pos] = event.target.value;
+            obj[counter_type][event.target.name] = [...this.state.config[counter_type][event.target.name]];
+            obj[counter_type][event.target.name][index] = event.target.value;
         }
 
         this.setState({
@@ -101,18 +101,22 @@ export default class CounterConfig extends Component {
                                 <br/>,
                                 this.state.hour_counters[counter] ?
                                     <div>
-                                        <InputGroup><Input
-                                            name="start_date"
+                                        <InputGroup>
+                                            <Input
+                                            name={counter}
                                             placeholder={counter + " start date"}
                                             value={this.state.config.hour_counters[counter][0]}
-                                            onChange={event => this.handleChange(event, "hour_counters", counter, 0)}
-                                        /></InputGroup>
-                                        <InputGroup><Input
-                                            name="start_date"
+                                            onChange={event => this.handleChange(event, "hour_counters", 0)}
+                                            />
+                                        </InputGroup>
+                                        <InputGroup>
+                                            <Input
+                                            name={counter}
                                             placeholder={counter + " end date"}
                                             value={this.state.config.hour_counters[counter][1]}
-                                            onChange={event => this.handleChange(event, "hour_counters", counter, 1)}
-                                        /></InputGroup>
+                                            onChange={event => this.handleChange(event, "hour_counters", 1)}
+                                            />
+                                        </InputGroup>
 
                                     </div> : null]
                         ))
@@ -126,35 +130,44 @@ export default class CounterConfig extends Component {
                                 size="sm"
                                 outline
                                 color="primary"
-                                onClick={() => this.handleClick("hour_counters", counter)}>
+                                onClick={() => this.handleClick("day_counters", counter)}>
                                 {counter}
                             </Button>,
                                 <br/>,
-                                this.state.hour_counters[counter] ?
+                                this.state.day_counters[counter] ?
                                     this.state.config.day_counters[counter].length > 1 ?
                                         <div>
-                                            <Input
-                                                name="start_date"
-                                                placeholder={counter + " start date"}
-                                                value={this.state.config.day_counters[counter][0]}
-                                                onChange={event => this.handleChange(event, "day_counters", counter, 0)}
-                                            />
-                                            <Input
-                                                name="start_date"
-                                                placeholder={counter + " end date"}
-                                                value={this.state.config.day_counters[counter][1]}
-                                                onChange={event => this.handleChange(event, "day_counters", counter, 1)}
-                                            />
+                                            <InputGroup>
+                                                <Input
+                                                    name={counter}
+                                                    placeholder={counter + " start date"}
+                                                    value={this.state.config.day_counters[counter][0]}
+                                                    onChange={event => this.handleChange(event, "day_counters", 0)}
+                                                />
+                                            </InputGroup>
+                                            <InputGroup>
+                                                <Input
+                                                    name={counter}
+                                                    placeholder={counter + " end date"}
+                                                    value={this.state.config.day_counters[counter][1]}
+                                                    onChange={event => this.handleChange(event, "day_counters", 1)}
+                                                />
+                                            </InputGroup>
                                         </div>
                                         :
                                         <div>
-                                            <Input
-                                                placeholder={"Day of " + counter}
-                                                value={this.state.config.day_counters[counter]}
-                                                onChange={event => this.handleChange(event, "day_counters", counter)}
-                                            />
+                                            <InputGroup>
+                                                <Input
+                                                    name={counter}
+                                                    placeholder={"Day of " + counter}
+                                                    value={this.state.config.day_counters[counter]}
+                                                    onChange={event => this.handleChange(event, "day_counters")}
+                                                />
+                                            </InputGroup>
                                             <p>
-                                                {/**moment().isoWeekday(this.state.config.day_counters[counter]).format("dddd")**/}
+                                                {
+                                                    moment().isoWeekday(this.state.config.day_counters[counter]).format("dddd")
+                                                }
                                             </p>
                                         </div> : null]
                         ))

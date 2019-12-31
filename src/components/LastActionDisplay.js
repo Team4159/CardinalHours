@@ -23,7 +23,11 @@ export default class LastActionDisplay extends Component {
     componentDidMount() {
         const populateAdditionalFields = user => (Object.assign(
             Object.keys(DB.config.day_counters).reduce((acc, cur) => {
-                acc[cur] = DB.getTotalCertainDays(user, DB.config.day_counters[cur]);
+                if (typeof DB.config.day_counters[cur] === 'number') {
+                    acc[cur] = DB.getTotalCertainDays(user, DB.config.day_counters[cur]);
+                } else {
+                    acc[cur] = DB.getTotalDays(DB.filterSessions(user.sessions, DB.config.day_counters[cur]))
+                }
                 return acc;
             }, {}),
             Object.keys(DB.config.hour_counters).reduce((acc, cur) => {

@@ -252,10 +252,6 @@ class DB {
         }
     }
 
-    getTotalDays(sessions) {
-        return sessions.filter((session, index) => index === 0 || !moment(session.start).isSame(moment(sessions[index - 1]), 'day')).length;
-    }
-
     getTotalUserDays(user) {
         user = this.query(user);
         return this.getTotalDays(user.sessions);
@@ -264,10 +260,6 @@ class DB {
     getTotalCertainDays(user, day) {
         user = this.query(user);
         return (day === 5 && user.imported_meetings ? user.imported_meetings : 0) + this.getTotalDays(user.sessions.filter(session => moment(session.start).isoWeekday() == day));
-    }
-
-    getTotalTime(sessions) {
-        return sessions.reduce((acc, cur) => acc + moment(cur.end).diff(moment(cur.start)), 0);
     }
 
     getTotalDays(sessions) {
