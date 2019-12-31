@@ -26,15 +26,27 @@ export default class MainContainer extends Component {
     render() {
         return (
             <Container className='MainContainer'>
-                <h1 className='Header'>CardinalHours</h1>
                 <Row>
                     <Col>
-                        <Row style={{height: '10%'}}>
-                            <AdminPanel refresh={this.refreshMainContainer}/>
+                        <h1 className='Header'>CardinalHours</h1>
+                    </Col>
+                    <Col>
+                        <Row style={{height: '10%', marginTop: 10}}>
+                            <Col xs="8">
+                            </Col>
+                            <Col xs="4">
+                                <AdminPanel refresh={this.refreshMainContainer}/>
+                            </Col>
                         </Row>
-                        {DB.config.sign_ups ? <Row style={{height: '25%'}}>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        {
+                            DB.config.sign_ups ? <Row style={{height: '25%'}}>
                             <UserDisplay/>
-                        </Row> : null}
+                            </Row> : null
+                        }
                         <Row style={{height: '65%'}}>
                             <LastActionDisplay/>
                         </Row>
