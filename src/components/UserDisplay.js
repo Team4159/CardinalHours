@@ -1,5 +1,10 @@
-import React, { Component } from 'react';
-import { Container, Button, Input } from 'reactstrap';
+import React, {Component} from 'react';
+import {
+    Container,
+    Button,
+    Input,
+    InputGroup
+} from 'reactstrap';
 
 import UserStore from '../state/UserStore';
 
@@ -45,22 +50,26 @@ export default class UserDisplay extends Component {
     render() {
         return (
             <Container className='UserDisplay'>
-                <form onSubmit={ this.onSubmit }>
-                    <Input
-                        name='name'
-                        placeholder='Name'
-                        value={ this.state.name }
-                        onChange={ this.handleChange }
-                    />
-                    <Input
+                <form onSubmit={this.onSubmit}>
+                    <InputGroup>
+                        <Input
+                            name='name'
+                            placeholder='Name'
+                            value={this.state.name}
+                            onChange={this.handleChange}
+                        />
+                    </InputGroup>
+                    <InputGroup>
+                        <Input
                         name='id'
                         placeholder='Student ID'
-                        value={ this.state.id }
-                        onChange={ this.handleChange }
-                    />
+                        value={this.state.id}
+                        onChange={this.handleChange}
+                        />
+                    </InputGroup>
                     <Button
                         color='light'
-                        onClick={ this.onSubmit }
+                        onClick={this.onSubmit}
                         type='submit'
                     >Add New User</Button>
                 </form>

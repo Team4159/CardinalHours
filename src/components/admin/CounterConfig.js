@@ -1,16 +1,22 @@
 import React, {Component} from 'react';
-import DB from "../../state/DB";
+import {
+    Button,
+    Input,
+    InputGroup
+} from "reactstrap";
+
 import moment from "moment";
-import {Button, Input} from "reactstrap";
+
+import DB from "../../state/DB";
 
 export default class CounterConfig extends Component {
     constructor(props) {
         super(props);
 
-        this.state = ({
+        this.state = {
             hour_counters: {},
             day_counters: {}
-        });
+        };
 
         this.isConfigValid = this.isConfigValid.bind(this);
         this.handleClick = this.handleClick.bind(this);
@@ -73,57 +79,60 @@ export default class CounterConfig extends Component {
     handleSubmit(event) {
         event.preventDefault();
         if (this.isConfigValid()) {
-            DB.writeToFile(this.state.config);
+            DB.setConfig(this.state.config);
+            DB.updateConfigFile();
         }
     }
 
     render() {
         return (
             <div>
-                Hour Counters
+                <label> Hour Counters </label>
                 <div>
                     {
                         Object.keys(this.state.config.hour_counters).map((counter, idx) => (
                             [<Button
-                                key={idx}
+                                size="sm"
                                 outline
                                 color="primary"
                                 onClick={() => this.handleClick("hour_counters", counter)}>
                                 {counter}
                             </Button>,
-                                <br key={idx}/>,
+                                <br/>,
                                 this.state.hour_counters[counter] ?
-                                    <div key={idx + this.state.config.hour_counters.length}>
-                                        <Input
+                                    <div>
+                                        <InputGroup><Input
                                             name="start_date"
                                             placeholder={counter + " start date"}
                                             value={this.state.config.hour_counters[counter][0]}
                                             onChange={event => this.handleChange(event, "hour_counters", counter, 0)}
-                                        />
-                                        <Input
+                                        /></InputGroup>
+                                        <InputGroup><Input
                                             name="start_date"
                                             placeholder={counter + " end date"}
                                             value={this.state.config.hour_counters[counter][1]}
                                             onChange={event => this.handleChange(event, "hour_counters", counter, 1)}
-                                        />
+                                        /></InputGroup>
+
                                     </div> : null]
                         ))
                     }
                 </div>
-                Day Counters
+                <label> Day Counters </label>
                 <div>
                     {
                         Object.keys(this.state.config.day_counters).map((counter, idx) => (
-                            [<Button key={idx + this.state.config.hour_counters.length}
-                                     outline
-                                     color="primary"
-                                     onClick={() => this.handleClick("hour_counters", counter)}>
+                            [<Button
+                                size="sm"
+                                outline
+                                color="primary"
+                                onClick={() => this.handleClick("hour_counters", counter)}>
                                 {counter}
                             </Button>,
-                                <br key={idx + this.state.config.hour_counters.length}/>,
+                                <br/>,
                                 this.state.hour_counters[counter] ?
                                     this.state.config.day_counters[counter].length > 1 ?
-                                        <div key={idx + this.state.config.hour_counters.length}>
+                                        <div>
                                             <Input
                                                 name="start_date"
                                                 placeholder={counter + " start date"}
@@ -138,16 +147,16 @@ export default class CounterConfig extends Component {
                                             />
                                         </div>
                                         :
-                                    <div key={idx + this.state.config.hour_counters.length}>
-                                        <Input
-                                            placeholder={"Day of " + counter}
-                                            value={this.state.config.day_counters[counter]}
-                                            onChange={event => this.handleChange(event, "day_counters", counter)}
-                                        />
-                                        <p>
-                                            {/**moment().isoWeekday(this.state.config.day_counters[counter]).format("dddd")**/}
-                                        </p>
-                                    </div> : null]
+                                        <div>
+                                            <Input
+                                                placeholder={"Day of " + counter}
+                                                value={this.state.config.day_counters[counter]}
+                                                onChange={event => this.handleChange(event, "day_counters", counter)}
+                                            />
+                                            <p>
+                                                {/**moment().isoWeekday(this.state.config.day_counters[counter]).format("dddd")**/}
+                                            </p>
+                                        </div> : null]
                         ))
                     }
                 </div>

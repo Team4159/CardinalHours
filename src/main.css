@@ -11,6 +11,14 @@ body, html, .container {
 }
 
 /*
+margins in admin panel
+ */
+
+button, .input-group, label {
+    margin-bottom: 8px !important;
+}
+
+/*
 overflow stuff
 */
 
@@ -42,10 +50,8 @@ overflow stuff
     float: left;
 }
 
-input {
-    margin-bottom: 5px !important;
-}
-
 .Header {
     margin-bottom: 25px;
 }
+
+

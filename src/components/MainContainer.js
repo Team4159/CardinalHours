@@ -1,5 +1,9 @@
-import React, { Component } from 'react';
-import { Container, Row, Col } from 'reactstrap';
+import React, {Component} from 'react';
+import {
+    Container,
+    Row,
+    Col
+} from 'reactstrap';
 
 import TimeTable from './TimeTable';
 import UserDisplay from './UserDisplay';
@@ -25,13 +29,13 @@ export default class MainContainer extends Component {
                 <h1 className='Header'>CardinalHours</h1>
                 <Row>
                     <Col>
-                        <Row style={ { height: '10%' } }>
+                        <Row style={{height: '10%'}}>
                             <AdminPanel refresh={this.refreshMainContainer}/>
                         </Row>
-                        { DB.config.sign_ups ? <Row style={ { height: '25%' } }>
+                        {DB.config.sign_ups ? <Row style={{height: '25%'}}>
                             <UserDisplay/>
-                        </Row> : null }
-                        <Row style={ { height: '65%' } }>
+                        </Row> : null}
+                        <Row style={{height: '65%'}}>
                             <LastActionDisplay/>
                         </Row>
                     </Col>

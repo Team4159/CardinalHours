@@ -1,18 +1,18 @@
 import fs from 'fs';
 import path from 'path';
 
+import log from 'electron-log';
+import hash from 'password-hash';
+
 import moment from 'moment';
 import GoogleSpreadsheet from 'google-spreadsheet';
-import log from 'electron-log';
 import { remote } from 'electron';
-
-const hash = require('password-hash');
 
 class DB {
     constructor() {
         log.info('Initializing database...');
 
-        this.filename = path.join(remote.getGlobal('dataPath'), 'users.json');
+        this.users_filename = path.join(remote.getGlobal('dataPath'), 'users.json');
         this.fsWait = false;
 
         this.isDev = true;//remote.getGlobal('isDev');
@@ -28,15 +28,15 @@ class DB {
             this.config = require('./default_config.json');
         }
 
-        if (fs.existsSync(this.filename)) {
-            this.users = JSON.parse(fs.readFileSync(this.filename));
+        if (fs.existsSync(this.users_filename)) {
+            this.users = JSON.parse(fs.readFileSync(this.users_filename));
         } else {
-            fs.writeFileSync(this.filename, JSON.stringify([]));
+            fs.writeFileSync(this.users_filename, JSON.stringify([]));
             this.users = [];
         }
 
-        fs.watchFile(this.filename, () => {
-            this.users = JSON.parse(fs.readFileSync(this.filename));
+        fs.watchFile(this.users_filename, () => {
+            this.users = JSON.parse(fs.readFileSync(this.users_filename));
         });
 
 
@@ -50,7 +50,7 @@ class DB {
         });
     }
 
-    checkPassword(password) {
+    verifyPassword(password) {
         return hash.verify(password, this.config.hashed_password);
     }
 
@@ -60,24 +60,30 @@ class DB {
 
     setPassword(password) {
         if (password === null) {
-            this.writeToFile({...this.config, ...{"hashed_password": null}});
+            this.setConfig({...this.config, ...{"hashed_password": null}});
         } else {
-            this.writeToFile({...this.config, ...{"hashed_password": hash.generate(password)}});
+            this.setConfig({...this.config, ...{"hashed_password": hash.generate(password)}});
         }
+
+        this.updateConfigFile();
     }
 
-    writeToFile(config) {
+    setConfig(config) {
         this.config = config;
-        fs.writeFileSync(this.config_filename, JSON.stringify(config), err => err ? console.error(err) : null );
+    }
+
+    updateConfigFile() {
+        log.info('Updating config file...');
+        fs.writeFileSync(this.config_filename, JSON.stringify(this.config), err => {err ? console.error(err) : null });
     }
 
     setUsers(users) {
         this.users = users;
     }
 
-    updateFile() {
+    updateUsersFile() {
         log.info('Updating users file...');
-        fs.writeFileSync(this.filename, JSON.stringify(this.users));
+        fs.writeFileSync(this.users_filename, JSON.stringify(this.users), err => {err ? console.error(err) : null});
     }
 
     updateSheets(user) {
@@ -199,7 +205,7 @@ class DB {
             sessions: []
         });
 
-        this.updateFile();
+        this.updateUsersFile();
 
         return true;
     }
@@ -209,7 +215,7 @@ class DB {
         this.query(user).sessions.push(session);
 
         this.updateSheets(user);
-        this.updateFile();
+        this.updateUsersFile();
     }
 
     query(query) {
@@ -235,7 +241,7 @@ class DB {
         if (!this.isDev) {
             this.syncSheets(user);
         }
-        this.updateFile();
+        this.updateUsersFile();
     }
 
     filterSessions(sessions, filter) {

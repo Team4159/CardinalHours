@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Jumbotron } from 'reactstrap';
+import React, {Component} from 'react';
+import {Jumbotron} from 'reactstrap';
 
 import moment from 'moment';
 
@@ -41,7 +41,7 @@ export default class LastActionDisplay extends Component {
             additional_fields: populateAdditionalFields(user)
         }));
 
-        UserStore.onSignOutUser(({ user, session }) => this.setState({
+        UserStore.onSignOutUser(({user, session}) => this.setState({
             name: user.name,
             action: 'OUT',
             session_time: moment(session.end).diff(session.start),
@@ -53,16 +53,18 @@ export default class LastActionDisplay extends Component {
     render() {
         return (
             <Jumbotron className='LastActionDisplay'>
-                <h1 className='display-3'>{ this.state.name }</h1>
-                <h1 className='display-3' style={ { color: this.state.action === 'IN' ? 'green' : 'red' } }>{ this.state.action }</h1>
+                <h1 className='display-3'>{this.state.name}</h1>
+                <h1 className='display-3'
+                    style={{color: this.state.action === 'IN' ? 'green' : 'red'}}>{this.state.action}</h1>
                 <hr className='my-2'/>
                 <p className='lead'>
-                    Session Time: { typeof this.state.session_time === 'number' ? TimeTable.formatTime(this.state.session_time) : this.state.session_time }
+                    Session
+                    Time: {typeof this.state.session_time === 'number' ? TimeTable.formatTime(this.state.session_time) : this.state.session_time}
                     <br/>
-                    Total Time: { TimeTable.formatTime(this.state.total_time) }
+                    Total Time: {TimeTable.formatTime(this.state.total_time)}
                     {
                         Object.keys(this.state.additional_fields).map((key, idx) => (
-                            [<br key={ idx }/>, key + ": " + this.state.additional_fields[key]]
+                            [<br key={idx}/>, key + ": " + this.state.additional_fields[key]]
                         ))
                     }
                 </p>

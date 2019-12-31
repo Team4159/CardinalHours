@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
+import ReactModal from "react-modal";
 import {
     Button,
+    Input,
     InputGroup,
     InputGroupAddon,
     InputGroupText,
@@ -9,12 +11,12 @@ import {
     PaginationLink,
     Badge
 } from 'reactstrap';
-import ReactModal from "react-modal";
-import DB from '../state/DB'
+
 import CounterConfig from "./admin/CounterConfig";
 import MiscConfig from "./admin/MiscConfig";
 import UserConfig from "./admin/UserConfig";
-import Input from "reactstrap/es/Input";
+
+import DB from '../state/DB'
 
 export default class AdminPanel extends Component {
     constructor(props) {
@@ -22,7 +24,7 @@ export default class AdminPanel extends Component {
 
         this.state = {
             unlocked: false,
-            passwordInput: "",
+            password_input_value: "",
             showModal: false,
             pagination: "COUNTER",
         };
@@ -38,14 +40,15 @@ export default class AdminPanel extends Component {
     }
 
     resetConfig() {
-        DB.writeToFile({...require("../state/default_config")})
+        DB.setConfig({...require("../state/default_config")});
+        DB.updateConfigFile();
         this.forceUpdate();
     }
 
     handleOpenModal() {
         this.setState({
             unlocked: DB.isPasswordNotSet(),
-            passwordInput: "",
+            password_input_value: "",
             showModal: true
         });
     }
@@ -64,7 +67,7 @@ export default class AdminPanel extends Component {
 
     handlePasswordChange(event) {
         this.setState({
-            passwordInput: event.target.value
+            password_input_value: event.target.value
         })
     }
 
@@ -74,7 +77,7 @@ export default class AdminPanel extends Component {
             event.stopPropagation();
 
             this.setState({
-                unlocked: DB.checkPassword(this.state.passwordInput)
+                unlocked: DB.verifyPassword(this.state.password_input_value)
             });
         }
     }
@@ -103,21 +106,25 @@ export default class AdminPanel extends Component {
                                         <div>
                                             <Badge color="danger" pill>!</Badge>
                                             <small> No password set!</small>
+                                            <br/>
                                         </div> : null
                                 }
                                 <Pagination size="sm">
                                     <PaginationItem active={this.state.pagination === "COUNTER"}>
-                                        <PaginationLink href='#' onClick={event => this.handlePagination(event, "COUNTER")}>
+                                        <PaginationLink href='#'
+                                                        onClick={event => this.handlePagination(event, "COUNTER")}>
                                             Counter Configuration
                                         </PaginationLink>
                                     </PaginationItem>
                                     <PaginationItem active={this.state.pagination === "USERS"}>
-                                        <PaginationLink href='#' onClick={event => this.handlePagination(event, "USERS")}>
+                                        <PaginationLink href='#'
+                                                        onClick={event => this.handlePagination(event, "USERS")}>
                                             User Configuration
                                         </PaginationLink>
                                     </PaginationItem>
                                     <PaginationItem active={this.state.pagination === "MISC"}>
-                                        <PaginationLink href='#' onClick={event => this.handlePagination(event, "MISC")}>
+                                        <PaginationLink href='#'
+                                                        onClick={event => this.handlePagination(event, "MISC")}>
                                             Miscellaneous Options
                                         </PaginationLink>
                                     </PaginationItem>
@@ -126,7 +133,8 @@ export default class AdminPanel extends Component {
                                     {
                                         this.state.pagination === "COUNTER" ? <CounterConfig/> :
                                             this.state.pagination === "USERS" ? <UserConfig/> :
-                                                this.state.pagination === "MISC" ? <MiscConfig refresh={this.props.refresh}/> : null
+                                                this.state.pagination === "MISC" ?
+                                                    <MiscConfig refresh={this.props.refresh}/> : null
                                     }
                                 </div>
                                 <br/>
@@ -141,9 +149,11 @@ export default class AdminPanel extends Component {
                             </div>
                             :
                             <div>
-                                 <InputGroup>
-                                    <InputGroupAddon addonType="prepend"><InputGroupText>Password</InputGroupText></InputGroupAddon>
-                                    <Input type="password" value={this.state.passwordInput} onChange={this.handlePasswordChange} onKeyDown={this.handlePasswordSubmit}/>
+                                <InputGroup>
+                                    <InputGroupAddon
+                                        addonType="prepend"><InputGroupText>Password</InputGroupText></InputGroupAddon>
+                                    <Input type="password" value={this.state.password_input_value}
+                                           onChange={this.handlePasswordChange} onKeyDown={this.handlePasswordSubmit}/>
                                 </InputGroup>
                             </div>
                     }

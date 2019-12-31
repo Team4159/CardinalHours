@@ -1,16 +1,24 @@
 import React, {Component} from 'react';
+import {
+    Badge,
+    Button,
+    Input,
+    InputGroup,
+    InputGroupAddon,
+    InputGroupText
+} from "reactstrap";
+
 import DB from "../../state/DB";
-import {Badge, Button, Input, InputGroup, InputGroupAddon, InputGroupText} from "reactstrap";
 
 export default class MiscConfig extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            oldPasswordInput: "",
-            newPasswordInput: "",
-            confirmPasswordInput: "",
-            showPasswordInputs: false,
+            old_password: "",
+            new_password: "",
+            confirm_password: "",
+            show_password_input: false,
         };
 
         this.toggleSignUps = this.toggleSignUps.bind(this);
@@ -20,13 +28,14 @@ export default class MiscConfig extends Component {
     }
 
     toggleSignUps() {
-        DB.writeToFile({...DB.config, ...{"sign_ups": !DB.config.sign_ups}});
+        DB.setConfig({...DB.config, ...{"sign_ups": !DB.config.sign_ups}});
+        DB.updateConfigFile();
         this.props.refresh();
     }
 
     togglePasswordInput() {
         this.setState({
-            showPasswordInputs: !this.state.showPasswordInputs,
+            show_password_input: !this.state.show_password_input,
         })
     }
 
@@ -37,13 +46,13 @@ export default class MiscConfig extends Component {
     }
 
     handlePasswordSubmit(event) {
-        if (this.state.newPasswordInput === this.state.confirmPasswordInput && (DB.isPasswordNotSet || DB.checkPassword(this.state.oldPasswordInput))) {
-            DB.setPassword(this.state.newPasswordInput);
+        if (this.state.new_password === this.state.confirm_password && (DB.isPasswordNotSet || DB.verifyPassword(this.state.old_password))) {
+            DB.setPassword(this.state.new_password);
 
             this.setState({
-                oldPasswordInput: "",
-                newPasswordInput: "",
-                confirmPasswordInput: ""
+                old_password: "",
+                new_password: "",
+                confirm_password: ""
             })
         }
     }
@@ -55,33 +64,47 @@ export default class MiscConfig extends Component {
                     outline
                     onClick={this.toggleSignUps}
                     color={DB.config.sign_ups ? "primary" : "secondary"}
-                >Sign Ups {DB.config.sign_ups ?
-                    <Badge color="success" pill>Enabled</Badge>
-                    :<Badge color="dark" pill>Disabled</Badge>}
+                >Sign Ups {
+                    DB.config.sign_ups ?
+                        <Badge color="success" pill>Enabled</Badge>
+
+                        : <Badge color="dark" pill>Disabled</Badge>
+                }
                 </Button>
                 <br/>
                 <Button
                     onClick={this.togglePasswordInput}
                 >Change Password</Button>
                 {
-                    this.state.showPasswordInputs ?
+                    this.state.show_password_input ?
                         <div>
                             {
                                 DB.isPasswordNotSet() ? null :
-                                <InputGroup>
-                                    <InputGroupAddon addonType="prepend"><InputGroupText>Current Password</InputGroupText></InputGroupAddon>
-                                    <Input type="password" value={this.state.oldPasswordInput} onChange={e => this.handlePasswordChange(e, "oldPasswordInput")}/>
-                                </InputGroup>
+                                    <InputGroup>
+                                        <InputGroupAddon addonType="prepend">
+                                            <InputGroupText>Current Password</InputGroupText>
+                                        </InputGroupAddon>
+                                        <Input type="password" value={this.state.old_password}
+                                               onChange={e => this.handlePasswordChange(e, "old_password")}/>
+                                    </InputGroup>
                             }
+
                             <InputGroup>
-                                <InputGroupAddon addonType="prepend"><InputGroupText>New Password</InputGroupText></InputGroupAddon>
-                                <Input type="password" value={this.state.newPasswordInput} onChange={e => this.handlePasswordChange(e, "newPasswordInput")}/>
+                                <InputGroupAddon addonType="prepend">
+                                    <InputGroupText>New Password</InputGroupText>
+                                </InputGroupAddon>
+                                <Input type="password" value={this.state.new_password}
+                                       onChange={e => this.handlePasswordChange(e, "new_password")}/>
                             </InputGroup>
                             <InputGroup>
-                                <InputGroupAddon addonType="prepend"><InputGroupText>Confirm New Password</InputGroupText></InputGroupAddon>
-                                <Input type="password" value={this.state.confirmPasswordInput} onChange={e => this.handlePasswordChange(e, "confirmPasswordInput")}/>
+                                <InputGroupAddon addonType="prepend">
+                                    <InputGroupText>Confirm New Password</InputGroupText>
+                                </InputGroupAddon>
+                                <Input type="password" value={this.state.confirm_password}
+                                       onChange={e => this.handlePasswordChange(e, "confirm_password")}/>
                             </InputGroup>
-                            <Button size="sm" onClick={this.handlePasswordSubmit} color={this.state.newPasswordInput === this.state.confirmPasswordInput ? "success" : "warning"}>{DB.isPasswordNotSet() ? "Set Password" : "Submit New Password"}</Button>
+                            <Button size="sm" onClick={this.handlePasswordSubmit}
+                                    color={this.state.new_password === this.state.confirm_password ? "success" : "warning"}>{DB.isPasswordNotSet() ? "Set Password" : "Submit New Password"}</Button>
                         </div> : null
                 }
             </div>

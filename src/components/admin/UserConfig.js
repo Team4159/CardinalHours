@@ -1,7 +1,14 @@
 import React, {Component} from 'react';
-import DB from "../../state/DB";
-import {Button, Input, InputGroup, InputGroupAddon, InputGroupText} from "reactstrap";
 import Select from "react-dropdown-select"
+import {
+    Button,
+    Input,
+    InputGroup,
+    InputGroupAddon,
+    InputGroupText
+} from "reactstrap";
+
+import DB from "../../state/DB";
 
 export default class UserConfig extends Component {
     constructor(props) {
@@ -9,10 +16,10 @@ export default class UserConfig extends Component {
 
         this.state = ({
             users: DB.users,
-            searchValue: '',
-            selectedUser: null,
-            selectedUserName: null,
-            selectedUserID: null,
+            search_value: '',
+            selected_user: null,
+            selected_user_name: null,
+            selected_user_id: null,
         });
 
         this.handleSelectUser = this.handleSelectUser.bind(this);
@@ -31,18 +38,18 @@ export default class UserConfig extends Component {
 
     handleSaveAllChanges() {
         DB.setUsers(this.state.users);
-        DB.updateFile();
+        DB.updateUsersFile();
     }
 
     handleSaveChangesToUser() {
         let user = {
-            ...this.state.selectedUser,
-            ...{'name': this.state.selectedUserName},
-            ...{'id': this.state.selectedUserID}
+            ...this.state.selected_user,
+            ...{'name': this.state.selected_user_name},
+            ...{'id': this.state.selected_user_id}
         };
 
         let users = this.state.users;
-        users[this.state.users.indexOf(this.state.selectedUser)] = user;
+        users[this.state.users.indexOf(this.state.selected_user)] = user;
 
         this.setState({
             users: users,
@@ -50,34 +57,34 @@ export default class UserConfig extends Component {
     }
 
     handleDropUser() {
-        let users = this.state.users.filter(user => user !== this.state.selectedUser);
+        let users = this.state.users.filter(user => user !== this.state.selected_user);
 
         this.setState({
             users: users,
-            selectedUser: null,
-            selectedUserName: null,
-            selectedUserID: null,
+            selected_user: null,
+            selected_user_name: null,
+            selected_user_id: null,
         })
     }
 
     handleNameChange(event) {
         this.setState({
-            selectedUserName: event.target.value
+            selected_user_name: event.target.value
         })
     }
 
     handleIDChange(event) {
         this.setState({
-            selectedUserID: event.target.value
+            selected_user_id: event.target.value
         })
     }
 
     handleSelectUser(user) {
         if (user) {
             this.setState({
-                selectedUser: user,
-                selectedUserName: user.name,
-                selectedUserID: user.id
+                selected_user: user,
+                selected_user_name: user.name,
+                selected_user_id: user.id
             })
         } else {
             console.error("User not found:" + user)
@@ -98,19 +105,22 @@ export default class UserConfig extends Component {
                 />
                 <br/>
                 {
-                    this.state.selectedUser ?
+                    this.state.selected_user ?
                         <div>
                             <InputGroup>
-                                <InputGroupAddon addonType="prepend"><InputGroupText>Name</InputGroupText></InputGroupAddon>
-                                <Input value={this.state.selectedUserName} onChange={this.handleNameChange}/>
+                                <InputGroupAddon
+                                    addonType="prepend"><InputGroupText>Name</InputGroupText></InputGroupAddon>
+                                <Input value={this.state.selected_user_name} onChange={this.handleNameChange}/>
                             </InputGroup>
                             <br/>
                             <InputGroup>
-                                <InputGroupAddon addonType="prepend"><InputGroupText>ID</InputGroupText></InputGroupAddon>
-                                <Input value={this.state.selectedUserID} onChange={this.handleIDChange}/>
+                                <InputGroupAddon
+                                    addonType="prepend"><InputGroupText>ID</InputGroupText></InputGroupAddon>
+                                <Input value={this.state.selected_user_id} onChange={this.handleIDChange}/>
                             </InputGroup>
                             <br/>
-                            <Button color="success" onClick={this.handleSaveChangesToUser}>{`Save Changes to ${this.state.selectedUser['name']}`}</Button>
+                            <Button color="success"
+                                    onClick={this.handleSaveChangesToUser}>{`Save Changes to ${this.state.selected_user['name']}`}</Button>
                             {' '}
                             <Button color="danger" onClick={this.handleDropUser}>Drop User</Button>
                         </div> : null
