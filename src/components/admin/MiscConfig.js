@@ -28,8 +28,10 @@ export default class MiscConfig extends Component {
     }
 
     toggleSignUps() {
-        DB.setConfig({...DB.config, ...{"sign_ups": !DB.config.sign_ups}});
-        DB.updateConfigFile();
+        DB.setAndUpdateConfigFile({
+            ...DB.config,
+            "sign_ups": !DB.config.sign_ups
+        });
         this.props.refresh();
     }
 
@@ -39,13 +41,13 @@ export default class MiscConfig extends Component {
         })
     }
 
-    handlePasswordChange(event, inputName) {
+    handlePasswordChange(event) {
         this.setState({
-            [inputName]: event.target.value
+            [event.target.name]: event.target.value
         })
     }
 
-    handlePasswordSubmit(event) {
+    handlePasswordSubmit() {
         if (this.state.new_password === this.state.confirm_password && (DB.isPasswordNotSet || DB.verifyPassword(this.state.old_password))) {
             DB.setPassword(this.state.new_password);
 
@@ -84,7 +86,9 @@ export default class MiscConfig extends Component {
                                         <InputGroupAddon addonType="prepend">
                                             <InputGroupText>Current Password</InputGroupText>
                                         </InputGroupAddon>
-                                        <Input type="password" value={this.state.old_password}
+                                        <Input type="password"
+                                               value={this.state.old_password}
+                                               name="old_password"
                                                onChange={e => this.handlePasswordChange(e, "old_password")}/>
                                     </InputGroup>
                             }
@@ -93,14 +97,18 @@ export default class MiscConfig extends Component {
                                 <InputGroupAddon addonType="prepend">
                                     <InputGroupText>New Password</InputGroupText>
                                 </InputGroupAddon>
-                                <Input type="password" value={this.state.new_password}
+                                <Input type="password"
+                                       value={this.state.new_password}
+                                       name="new_password"
                                        onChange={e => this.handlePasswordChange(e, "new_password")}/>
                             </InputGroup>
                             <InputGroup>
                                 <InputGroupAddon addonType="prepend">
                                     <InputGroupText>Confirm New Password</InputGroupText>
                                 </InputGroupAddon>
-                                <Input type="password" value={this.state.confirm_password}
+                                <Input type="password"
+                                       value={this.state.confirm_password}
+                                       new="confirm_password"
                                        onChange={e => this.handlePasswordChange(e, "confirm_password")}/>
                             </InputGroup>
                             <Button size="sm" onClick={this.handlePasswordSubmit}

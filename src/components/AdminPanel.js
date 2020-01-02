@@ -40,7 +40,7 @@ export default class AdminPanel extends Component {
     }
 
     resetConfig() {
-        DB.setConfig({...require("../state/default_config")});
+        DB.setConfig(require("../state/default_config"));
         DB.updateConfigFile();
         this.forceUpdate();
     }

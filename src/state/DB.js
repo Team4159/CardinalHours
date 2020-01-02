@@ -15,7 +15,7 @@ class DB {
         this.users_filename = path.join(remote.getGlobal('dataPath'), 'users.json');
         this.fsWait = false;
 
-        this.isDev = true;//remote.getGlobal('isDev');
+        this.isDev = remote.getGlobal('isDev');
 
         this.config_filename = path.join(remote.getGlobal('dataPath'), 'config.json');
         this.config = JSON.parse(fs.readFileSync(this.config_filename));
@@ -55,17 +55,21 @@ class DB {
     }
 
     isPasswordNotSet() {
-        return this.config.hashed_password === null;
+        return this.config.hashed_password === null || this.config.hashed_password === undefined;
     }
 
     setPassword(password) {
-        if (password === null) {
-            this.setConfig({...this.config, ...{"hashed_password": null}});
-        } else {
-            this.setConfig({...this.config, ...{"hashed_password": hash.generate(password)}});
-        }
+        this.setConfig({
+            ...this.config,
+            "hashed_password": password === null ? null : hash.generate(password)
+        });
 
         this.updateConfigFile();
+    }
+
+    setAndUpdateConfigFile(config) {
+        this.setConfig(config);
+        this.updateConfigFile()
     }
 
     setConfig(config) {

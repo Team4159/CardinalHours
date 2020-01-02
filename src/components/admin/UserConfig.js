@@ -8,6 +8,8 @@ import {
     InputGroupText
 } from "reactstrap";
 
+import log from 'electron-log';
+
 import DB from "../../state/DB";
 
 export default class UserConfig extends Component {
@@ -23,8 +25,7 @@ export default class UserConfig extends Component {
         });
 
         this.handleSelectUser = this.handleSelectUser.bind(this);
-        this.handleNameChange = this.handleNameChange.bind(this);
-        this.handleIDChange = this.handleIDChange.bind(this);
+        this.handleChange = this.handleChange.bind(this);
         this.handleDropUser = this.handleDropUser.bind(this);
         this.handleSaveChangesToUser = this.handleSaveChangesToUser.bind(this);
         this.handleSaveAllChanges = this.handleSaveAllChanges.bind(this);
@@ -67,15 +68,9 @@ export default class UserConfig extends Component {
         })
     }
 
-    handleNameChange(event) {
+    handleChange(event) {
         this.setState({
-            selected_user_name: event.target.value
-        })
-    }
-
-    handleIDChange(event) {
-        this.setState({
-            selected_user_id: event.target.value
+            [event.target.name]: event.target.value
         })
     }
 
@@ -87,7 +82,7 @@ export default class UserConfig extends Component {
                 selected_user_id: user.id
             })
         } else {
-            console.error("User not found:" + user)
+            log.error("User not found:" + user)
         }
     }
 
@@ -101,7 +96,7 @@ export default class UserConfig extends Component {
                     clearable={true}
                     separator={true}
                     closeOnSelect={true}
-                    onChange={(value) => this.handleSelectUser(value[0])}
+                    onChange={value => this.handleSelectUser(value[0])}
                 />
                 <br/>
                 {
@@ -110,13 +105,17 @@ export default class UserConfig extends Component {
                             <InputGroup>
                                 <InputGroupAddon
                                     addonType="prepend"><InputGroupText>Name</InputGroupText></InputGroupAddon>
-                                <Input value={this.state.selected_user_name} onChange={this.handleNameChange}/>
+                                <Input value={this.state.selected_user_name}
+                                       name="selected_user_name"
+                                       onChange={this.handleChange}/>
                             </InputGroup>
                             <br/>
                             <InputGroup>
                                 <InputGroupAddon
                                     addonType="prepend"><InputGroupText>ID</InputGroupText></InputGroupAddon>
-                                <Input value={this.state.selected_user_id} onChange={this.handleIDChange}/>
+                                <Input value={this.state.selected_user_id}
+                                       name="selected_user_id"
+                                       onChange={this.handleChange}/>
                             </InputGroup>
                             <br/>
                             <Button color="success"

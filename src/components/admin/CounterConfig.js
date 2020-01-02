@@ -79,8 +79,7 @@ export default class CounterConfig extends Component {
     handleSubmit(event) {
         event.preventDefault();
         if (this.isConfigValid()) {
-            DB.setConfig(this.state.config);
-            DB.updateConfigFile();
+            DB.setAndUpdateConfigFile(this.state.config);
         }
     }
 
