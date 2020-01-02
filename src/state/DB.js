@@ -61,7 +61,7 @@ class DB {
     setPassword(password) {
         this.setConfig({
             ...this.config,
-            "hashed_password": password === null ? null : hash.generate(password)
+            'hashed_password': password === null ? null : hash.generate(password)
         });
 
         this.updateConfigFile();
@@ -69,7 +69,7 @@ class DB {
 
     setAndUpdateConfigFile(config) {
         this.setConfig(config);
-        this.updateConfigFile()
+        this.updateConfigFile();
     }
 
     setConfig(config) {
@@ -79,6 +79,11 @@ class DB {
     updateConfigFile() {
         log.info('Updating config file...');
         fs.writeFileSync(this.config_filename, JSON.stringify(this.config), err => {err ? console.error(err) : null });
+    }
+
+    setAndUpdateUsersFile(users) {
+        this.setUsers(users);
+        this.updateUsersFile();
     }
 
     setUsers(users) {

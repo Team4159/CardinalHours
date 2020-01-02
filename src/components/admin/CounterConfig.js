@@ -3,11 +3,11 @@ import {
     Button,
     Input,
     InputGroup
-} from "reactstrap";
+} from 'reactstrap';
 
-import moment from "moment";
+import moment from 'moment';
 
-import DB from "../../state/DB";
+import DB from '../../state/DB';
 
 export default class CounterConfig extends Component {
     constructor(props) {
@@ -32,8 +32,8 @@ export default class CounterConfig extends Component {
             return acc;
         }, {});
 
-        let hour_counters = format("hour_counters");
-        let day_counters = format("day_counters");
+        let hour_counters = format('hour_counters');
+        let day_counters = format('day_counters');
 
         this.setState({
             config: config,
@@ -44,7 +44,7 @@ export default class CounterConfig extends Component {
 
     isConfigValid() {
         return Object.values({...this.state.config.hour_counters, ...this.state.config.day_counters}).every(
-            counter => counter.constructor === Array ? counter.every(date => moment(date).isValid()) : typeof counter === "number")
+            counter => counter.constructor === Array ? counter.every(date => moment(date).isValid()) : typeof counter === 'number');
     }
 
     handleClick(type, counter) {
@@ -53,7 +53,7 @@ export default class CounterConfig extends Component {
                 ...this.state[type],
                 [counter]: !this.state[type][counter]
             }
-        })
+        });
     }
 
     handleChange(event, counter_type, index) {
@@ -73,7 +73,7 @@ export default class CounterConfig extends Component {
                 ...this.state.config,
                 ...obj
             }
-        })
+        });
     }
 
     handleSubmit(event) {
@@ -91,10 +91,10 @@ export default class CounterConfig extends Component {
                     {
                         Object.keys(this.state.config.hour_counters).map((counter, idx) => (
                             [<Button
-                                size="sm"
+                                size='sm'
                                 outline
-                                color="primary"
-                                onClick={() => this.handleClick("hour_counters", counter)}>
+                                color='primary'
+                                onClick={() => this.handleClick('hour_counters', counter)}>
                                 {counter}
                             </Button>,
                                 <br/>,
@@ -103,17 +103,17 @@ export default class CounterConfig extends Component {
                                         <InputGroup>
                                             <Input
                                             name={counter}
-                                            placeholder={counter + " start date"}
+                                            placeholder={counter + 'start date'}
                                             value={this.state.config.hour_counters[counter][0]}
-                                            onChange={event => this.handleChange(event, "hour_counters", 0)}
+                                            onChange={event => this.handleChange(event, 'hour_counters', 0)}
                                             />
                                         </InputGroup>
                                         <InputGroup>
                                             <Input
                                             name={counter}
-                                            placeholder={counter + " end date"}
+                                            placeholder={counter + 'end date'}
                                             value={this.state.config.hour_counters[counter][1]}
-                                            onChange={event => this.handleChange(event, "hour_counters", 1)}
+                                            onChange={event => this.handleChange(event, 'hour_counters', 1)}
                                             />
                                         </InputGroup>
 
@@ -126,10 +126,10 @@ export default class CounterConfig extends Component {
                     {
                         Object.keys(this.state.config.day_counters).map((counter, idx) => (
                             [<Button
-                                size="sm"
+                                size='sm'
                                 outline
-                                color="primary"
-                                onClick={() => this.handleClick("day_counters", counter)}>
+                                color='primary'
+                                onClick={() => this.handleClick('day_counters', counter)}>
                                 {counter}
                             </Button>,
                                 <br/>,
@@ -139,17 +139,17 @@ export default class CounterConfig extends Component {
                                             <InputGroup>
                                                 <Input
                                                     name={counter}
-                                                    placeholder={counter + " start date"}
+                                                    placeholder={counter + 'start date'}
                                                     value={this.state.config.day_counters[counter][0]}
-                                                    onChange={event => this.handleChange(event, "day_counters", 0)}
+                                                    onChange={event => this.handleChange(event, 'day_counters', 0)}
                                                 />
                                             </InputGroup>
                                             <InputGroup>
                                                 <Input
                                                     name={counter}
-                                                    placeholder={counter + " end date"}
+                                                    placeholder={counter + 'end date'}
                                                     value={this.state.config.day_counters[counter][1]}
-                                                    onChange={event => this.handleChange(event, "day_counters", 1)}
+                                                    onChange={event => this.handleChange(event, 'day_counters', 1)}
                                                 />
                                             </InputGroup>
                                         </div>
@@ -158,14 +158,14 @@ export default class CounterConfig extends Component {
                                             <InputGroup>
                                                 <Input
                                                     name={counter}
-                                                    placeholder={"Day of " + counter}
+                                                    placeholder={'Day of ' + counter}
                                                     value={this.state.config.day_counters[counter]}
-                                                    onChange={event => this.handleChange(event, "day_counters")}
+                                                    onChange={event => this.handleChange(event, 'day_counters')}
                                                 />
                                             </InputGroup>
                                             <p>
                                                 {
-                                                    moment().isoWeekday(this.state.config.day_counters[counter]).format("dddd")
+                                                    moment().isoWeekday(this.state.config.day_counters[counter]).format('dddd')
                                                 }
                                             </p>
                                         </div> : null]
@@ -175,7 +175,7 @@ export default class CounterConfig extends Component {
                 <br/>
                 <Button
                     type='submit'
-                    color={this.isConfigValid() ? "success" : "danger"}
+                    color={this.isConfigValid() ? 'success' : 'danger'}
                     onClick={this.handleSubmit}
                 >Save Changes</Button>
             </div>

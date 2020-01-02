@@ -1,16 +1,16 @@
 import React, {Component} from 'react';
-import Select from "react-dropdown-select"
+import Select from 'react-dropdown-select'
 import {
     Button,
     Input,
     InputGroup,
     InputGroupAddon,
     InputGroupText
-} from "reactstrap";
+} from 'reactstrap';
 
 import log from 'electron-log';
 
-import DB from "../../state/DB";
+import DB from '../../state/DB';
 
 export default class UserConfig extends Component {
     constructor(props) {
@@ -38,8 +38,7 @@ export default class UserConfig extends Component {
     }
 
     handleSaveAllChanges() {
-        DB.setUsers(this.state.users);
-        DB.updateUsersFile();
+        DB.setAndUpdateUsersFile(this.state.users);
     }
 
     handleSaveChangesToUser() {
@@ -54,7 +53,7 @@ export default class UserConfig extends Component {
 
         this.setState({
             users: users,
-        })
+        });
     }
 
     handleDropUser() {
@@ -65,13 +64,13 @@ export default class UserConfig extends Component {
             selected_user: null,
             selected_user_name: null,
             selected_user_id: null,
-        })
+        });
     }
 
     handleChange(event) {
         this.setState({
             [event.target.name]: event.target.value
-        })
+        });
     }
 
     handleSelectUser(user) {
@@ -80,9 +79,9 @@ export default class UserConfig extends Component {
                 selected_user: user,
                 selected_user_name: user.name,
                 selected_user_id: user.id
-            })
+            });
         } else {
-            log.error("User not found:" + user)
+            log.error('User not found:' + user);
         }
     }
 
@@ -91,8 +90,8 @@ export default class UserConfig extends Component {
             <div>
                 <Select
                     options={this.state.users}
-                    valueField="name"
-                    labelField="name"
+                    valueField='name'
+                    labelField='name'
                     clearable={true}
                     separator={true}
                     closeOnSelect={true}
@@ -104,28 +103,28 @@ export default class UserConfig extends Component {
                         <div>
                             <InputGroup>
                                 <InputGroupAddon
-                                    addonType="prepend"><InputGroupText>Name</InputGroupText></InputGroupAddon>
+                                    addonType='prepend'><InputGroupText>Name</InputGroupText></InputGroupAddon>
                                 <Input value={this.state.selected_user_name}
-                                       name="selected_user_name"
+                                       name='selected_user_name'
                                        onChange={this.handleChange}/>
                             </InputGroup>
                             <br/>
                             <InputGroup>
                                 <InputGroupAddon
-                                    addonType="prepend"><InputGroupText>ID</InputGroupText></InputGroupAddon>
+                                    addonType='prepend'><InputGroupText>ID</InputGroupText></InputGroupAddon>
                                 <Input value={this.state.selected_user_id}
-                                       name="selected_user_id"
+                                       name='selected_user_id'
                                        onChange={this.handleChange}/>
                             </InputGroup>
                             <br/>
-                            <Button color="success"
+                            <Button color='success'
                                     onClick={this.handleSaveChangesToUser}>{`Save Changes to ${this.state.selected_user['name']}`}</Button>
                             {' '}
-                            <Button color="danger" onClick={this.handleDropUser}>Drop User</Button>
+                            <Button color='danger' onClick={this.handleDropUser}>Drop User</Button>
                         </div> : null
                 }
                 <br/>
-                <Button color="success" onClick={this.handleSaveAllChanges}>Confirm All Changes</Button>
+                <Button color='success' onClick={this.handleSaveAllChanges}>Confirm All Changes</Button>
             </div>
         )
     }

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import ReactModal from "react-modal";
+import ReactModal from 'react-modal';
 import {
     Button,
     Input,
@@ -12,9 +12,9 @@ import {
     Badge
 } from 'reactstrap';
 
-import CounterConfig from "./admin/CounterConfig";
-import MiscConfig from "./admin/MiscConfig";
-import UserConfig from "./admin/UserConfig";
+import CounterConfig from './admin/CounterConfig';
+import MiscConfig from './admin/MiscConfig';
+import UserConfig from './admin/UserConfig';
 
 import DB from '../state/DB'
 
@@ -24,9 +24,9 @@ export default class AdminPanel extends Component {
 
         this.state = {
             unlocked: false,
-            password_input_value: "",
-            showModal: false,
-            pagination: "COUNTER",
+            password_input_value: '',
+            show_modal: false,
+            pagination: 'COUNTER',
         };
 
         this.handleOpenModal = this.handleOpenModal.bind(this);
@@ -40,22 +40,23 @@ export default class AdminPanel extends Component {
     }
 
     resetConfig() {
-        DB.setConfig(require("../state/default_config"));
-        DB.updateConfigFile();
-        this.forceUpdate();
+        DB.setAndUpdateConfigFile(require('../state/default_config'));
+        this.setState({
+            show_modal: false
+        });
     }
 
     handleOpenModal() {
         this.setState({
             unlocked: DB.isPasswordNotSet(),
-            password_input_value: "",
-            showModal: true
+            password_input_value: '',
+            show_modal: true
         });
     }
 
     handleCloseModal() {
         this.setState({
-            showModal: false
+            show_modal: false
         });
     }
 
@@ -68,7 +69,7 @@ export default class AdminPanel extends Component {
     handlePasswordChange(event) {
         this.setState({
             password_input_value: event.target.value
-        })
+        });
     }
 
     handlePasswordSubmit(event) {
@@ -87,9 +88,9 @@ export default class AdminPanel extends Component {
             <div>
                 <Button onClick={this.handleOpenModal}>Admin Panel</Button>
                 <ReactModal
-                    isOpen={this.state.showModal}
+                    isOpen={this.state.show_modal}
                     ariaHideApp={false}
-                    contentLabel="Admin Panel"
+                    contentLabel='Admin Panel'
                     style={{
                         content: {
                             height: '90%',
@@ -104,42 +105,42 @@ export default class AdminPanel extends Component {
                                 {
                                     DB.isPasswordNotSet() ?
                                         <div>
-                                            <Badge color="danger" pill>!</Badge>
+                                            <Badge color='danger' pill>!</Badge>
                                             <small> No password set!</small>
                                             <br/>
                                         </div> : null
                                 }
-                                <Pagination size="sm">
-                                    <PaginationItem active={this.state.pagination === "COUNTER"}>
+                                <Pagination size='sm'>
+                                    <PaginationItem active={this.state.pagination === 'COUNTER'}>
                                         <PaginationLink href='#'
-                                                        onClick={event => this.handlePagination(event, "COUNTER")}>
+                                                        onClick={event => this.handlePagination(event, 'COUNTER')}>
                                             Counter Configuration
                                         </PaginationLink>
                                     </PaginationItem>
-                                    <PaginationItem active={this.state.pagination === "USERS"}>
+                                    <PaginationItem active={this.state.pagination === 'USERS'}>
                                         <PaginationLink href='#'
-                                                        onClick={event => this.handlePagination(event, "USERS")}>
+                                                        onClick={event => this.handlePagination(event, 'USERS')}>
                                             User Configuration
                                         </PaginationLink>
                                     </PaginationItem>
-                                    <PaginationItem active={this.state.pagination === "MISC"}>
+                                    <PaginationItem active={this.state.pagination === 'MISC'}>
                                         <PaginationLink href='#'
-                                                        onClick={event => this.handlePagination(event, "MISC")}>
+                                                        onClick={event => this.handlePagination(event, 'MISC')}>
                                             Miscellaneous Options
                                         </PaginationLink>
                                     </PaginationItem>
                                 </Pagination>
                                 <div>
                                     {
-                                        this.state.pagination === "COUNTER" ? <CounterConfig/> :
-                                            this.state.pagination === "USERS" ? <UserConfig/> :
-                                                this.state.pagination === "MISC" ?
+                                        this.state.pagination === 'COUNTER' ? <CounterConfig/> :
+                                            this.state.pagination === 'USERS' ? <UserConfig/> :
+                                                this.state.pagination === 'MISC' ?
                                                     <MiscConfig refresh={this.props.refresh}/> : null
                                     }
                                 </div>
                                 <br/>
                                 <Button
-                                    color="warning"
+                                    color='warning'
                                     onClick={this.resetConfig}
                                 >Reset</Button>
                                 {' '}
@@ -151,8 +152,8 @@ export default class AdminPanel extends Component {
                             <div>
                                 <InputGroup>
                                     <InputGroupAddon
-                                        addonType="prepend"><InputGroupText>Password</InputGroupText></InputGroupAddon>
-                                    <Input type="password" value={this.state.password_input_value}
+                                        addonType='prepend'><InputGroupText>Password</InputGroupText></InputGroupAddon>
+                                    <Input type='password' value={this.state.password_input_value}
                                            onChange={this.handlePasswordChange} onKeyDown={this.handlePasswordSubmit}/>
                                 </InputGroup>
                             </div>

@@ -8,7 +8,7 @@ import {
 import TimeTable from './TimeTable';
 import UserDisplay from './UserDisplay';
 import LastActionDisplay from './LastActionDisplay';
-import AdminPanel from "./AdminPanel";
+import AdminPanel from './AdminPanel';
 
 import DB from '../state/DB';
 
@@ -32,9 +32,9 @@ export default class MainContainer extends Component {
                     </Col>
                     <Col>
                         <Row style={{height: '10%', marginTop: 10}}>
-                            <Col xs="8">
+                            <Col xs='8'>
                             </Col>
-                            <Col xs="4">
+                            <Col xs='4'>
                                 <AdminPanel refresh={this.refreshMainContainer}/>
                             </Col>
                         </Row>
