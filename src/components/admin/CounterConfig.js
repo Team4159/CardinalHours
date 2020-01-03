@@ -44,7 +44,7 @@ export default class CounterConfig extends Component {
 
     isConfigValid() {
         return Object.values({...this.state.config.hour_counters, ...this.state.config.day_counters}).every(
-            counter => counter.constructor === Array ? counter.every(date => moment(date).isValid()) : typeof counter === 'number');
+            counter => counter.constructor === Array ? counter.every(date => moment(date).isValid()) : typeof counter === 'string' || typeof counter === 'number');
     }
 
     handleClick(type, counter) {
@@ -58,19 +58,16 @@ export default class CounterConfig extends Component {
 
     handleChange(event, counter_type, index) {
         let updated_counter = {
+            ...this.state.config[counter_type],
             [event.target.name]: index ?
-                parseInt(event.target.value) || 0 :
-                Object.assign([], this.state.config[counter_type], {[index]: event.target.value})
+                Object.assign([], this.state.config[counter_type][event.target.name], {[index]: event.target.value}) :
+                parseInt(event.target.value) || 0
         };
-
 
         this.setState({
             config: {
                 ...this.state.config,
-                [counter_type]: {
-                    ...this.state.config[counter_type],
-                    updated_counter
-                }
+                [counter_type]: updated_counter
             }
         });
     }
