@@ -57,21 +57,20 @@ export default class CounterConfig extends Component {
     }
 
     handleChange(event, counter_type, index) {
-        let obj = {
-            [counter_type]: this.state.config[counter_type]
+        let updated_counter = {
+            [event.target.name]: index ?
+                parseInt(event.target.value) || 0 :
+                Object.assign([], this.state.config[counter_type], {[index]: event.target.value})
         };
 
-        if (index === undefined) {
-            obj[counter_type][event.target.name] = parseInt(event.target.value) || 0;
-        } else {
-            obj[counter_type][event.target.name] = [...this.state.config[counter_type][event.target.name]];
-            obj[counter_type][event.target.name][index] = event.target.value;
-        }
 
         this.setState({
             config: {
                 ...this.state.config,
-                ...obj
+                [counter_type]: {
+                    ...this.state.config[counter_type],
+                    updated_counter
+                }
             }
         });
     }
@@ -116,7 +115,6 @@ export default class CounterConfig extends Component {
                                             onChange={event => this.handleChange(event, 'hour_counters', 1)}
                                             />
                                         </InputGroup>
-
                                     </div> : null]
                         ))
                     }
@@ -134,7 +132,7 @@ export default class CounterConfig extends Component {
                             </Button>,
                                 <br/>,
                                 this.state.day_counters[counter] ?
-                                    this.state.config.day_counters[counter].length > 1 ?
+                                    this.state.config.day_counters[counter] instanceof Array ?
                                         <div>
                                             <InputGroup>
                                                 <Input

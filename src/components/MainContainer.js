@@ -5,18 +5,23 @@ import {
     Col
 } from 'reactstrap';
 
+import MicroEmitter from 'micro-emitter';
+
 import TimeTable from './TimeTable';
 import UserDisplay from './UserDisplay';
 import LastActionDisplay from './LastActionDisplay';
 import AdminPanel from './AdminPanel';
 
+import EmitterHandler from '../state/EmitterHandler';
 import DB from '../state/DB';
 
 export default class MainContainer extends Component {
     constructor(props) {
         super(props);
 
-        this.refreshMainContainer = this.refreshMainContainer.bind(this);
+        EmitterHandler.onRefreshMainContainer(_ =>
+            this.refreshMainContainer()
+        );
     }
 
     refreshMainContainer() {
@@ -35,7 +40,7 @@ export default class MainContainer extends Component {
                             <Col xs='8'>
                             </Col>
                             <Col xs='4'>
-                                <AdminPanel refresh={this.refreshMainContainer}/>
+                                <AdminPanel/>
                             </Col>
                         </Row>
                     </Col>
@@ -43,7 +48,8 @@ export default class MainContainer extends Component {
                 <Row>
                     <Col>
                         {
-                            DB.config.sign_ups ? <Row style={{height: '25%'}}>
+                            DB.config.sign_ups ?
+                            <Row style={{height: '25%'}}>
                             <UserDisplay/>
                             </Row> : null
                         }

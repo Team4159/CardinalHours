@@ -8,6 +8,7 @@ import {
     InputGroupText
 } from 'reactstrap';
 
+import EmitterHandler from '../../state/EmitterHandler';
 import DB from '../../state/DB';
 
 export default class MiscConfig extends Component {
@@ -32,7 +33,9 @@ export default class MiscConfig extends Component {
             ...DB.config,
             'sign_ups': !DB.config.sign_ups
         });
-        this.props.refresh();
+
+        EmitterHandler.refreshMainContainer();
+        this.forceUpdate();
     }
 
     togglePasswordInput() {
