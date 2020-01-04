@@ -18,6 +18,8 @@ export default class CounterConfig extends Component {
             day_counters: {}
         };
 
+        this.resetKeyCounter();
+
         this.isConfigValid = this.isConfigValid.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -40,6 +42,10 @@ export default class CounterConfig extends Component {
             hour_counters: hour_counters,
             day_counters: day_counters,
         });
+    }
+
+    componentWillUpdate() {
+        this.resetKeyCounter();
     }
 
     isConfigValid() {
@@ -79,6 +85,15 @@ export default class CounterConfig extends Component {
         }
     }
 
+    resetKeyCounter() {
+        this.key = 0;
+    }
+
+    getKey() {
+        this.key++;
+        return this.key;
+    }
+
     render() {
         return (
             <div>
@@ -87,15 +102,20 @@ export default class CounterConfig extends Component {
                     {
                         Object.keys(this.state.config.hour_counters).map((counter, idx) => (
                             [<Button
+                                key={this.getKey()}
                                 size='sm'
                                 outline
                                 color='primary'
                                 onClick={() => this.handleClick('hour_counters', counter)}>
                                 {counter}
                             </Button>,
-                                <br/>,
+                                <br
+                                    key={this.getKey()}
+                                />,
                                 this.state.hour_counters[counter] ?
-                                    <div>
+                                    <div
+                                        key={this.getKey()}
+                                    >
                                         <InputGroup>
                                             <Input
                                             name={counter}
@@ -121,18 +141,24 @@ export default class CounterConfig extends Component {
                     {
                         Object.keys(this.state.config.day_counters).map((counter, idx) => (
                             [<Button
+                                key={this.getKey()}
                                 size='sm'
                                 outline
                                 color='primary'
                                 onClick={() => this.handleClick('day_counters', counter)}>
                                 {counter}
                             </Button>,
-                                <br/>,
+                                <br
+                                    key={this.getKey()}
+                                />,
                                 this.state.day_counters[counter] ?
                                     this.state.config.day_counters[counter] instanceof Array ?
-                                        <div>
+                                        <div
+                                            key={this.getKey()}
+                                        >
                                             <InputGroup>
                                                 <Input
+
                                                     name={counter}
                                                     placeholder={counter + 'start date'}
                                                     value={this.state.config.day_counters[counter][0]}
@@ -149,7 +175,9 @@ export default class CounterConfig extends Component {
                                             </InputGroup>
                                         </div>
                                         :
-                                        <div>
+                                        <div
+                                            key={this.getKey()}
+                                        >
                                             <InputGroup>
                                                 <Input
                                                     name={counter}
