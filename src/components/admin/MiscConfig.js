@@ -51,7 +51,7 @@ export default class MiscConfig extends Component {
     }
 
     handlePasswordSubmit() {
-        if (this.state.new_password === this.state.confirm_password && (DB.isPasswordNotSet || DB.verifyPassword(this.state.old_password))) {
+        if (this.state.new_password === this.state.confirm_password && (DB.isPasswordNotSet() || DB.verifyPassword(this.state.old_password))) {
             DB.setPassword(this.state.new_password);
 
             this.setState({
@@ -111,7 +111,7 @@ export default class MiscConfig extends Component {
                                 </InputGroupAddon>
                                 <Input type='password'
                                        value={this.state.confirm_password}
-                                       new='confirm_password'
+                                       name='confirm_password'
                                        onChange={e => this.handlePasswordChange(e, 'confirm_password')}/>
                             </InputGroup>
                             <Button size='sm' onClick={this.handlePasswordSubmit}

@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
     Button,
     Input,
@@ -65,9 +65,9 @@ export default class CounterConfig extends Component {
     handleChange(event, counter_type, index) {
         let updated_counter = {
             ...this.state.config[counter_type],
-            [event.target.name]: index ?
-                Object.assign([], this.state.config[counter_type][event.target.name], {[index]: event.target.value}) :
-                parseInt(event.target.value) || 0
+            [event.target.name]: index === undefined ?
+                parseInt(event.target.value) || 0 :
+                Object.assign([], this.state.config[counter_type][event.target.name], {[index]: event.target.value})
         };
 
         this.setState({
@@ -79,7 +79,6 @@ export default class CounterConfig extends Component {
     }
 
     handleSubmit(event) {
-        event.preventDefault();
         if (this.isConfigValid()) {
             DB.setAndUpdateConfigFile(this.state.config);
         }

@@ -74,12 +74,14 @@ export default class AdminPanel extends Component {
 
     handlePasswordSubmit(event) {
         if (event.key === 'Enter') {
-            event.preventDefault();
             event.stopPropagation();
 
             this.setState({
                 unlocked: DB.verifyPassword(this.state.password_input_value)
             });
+        } else if (event.key === 'Escape') {
+            event.stopPropagation();
+            this.handleCloseModal();
         }
     }
 

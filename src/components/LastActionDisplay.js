@@ -45,13 +45,25 @@ export default class LastActionDisplay extends Component {
             additional_fields: populateAdditionalFields(user)
         }));
 
-        UserStore.onSignOutUser(({user, session}) => this.setState({
-            name: user.name,
-            action: 'OUT',
-            session_time: moment(session.end).diff(session.start),
-            total_time: DB.getTotalUserTime(user),
-            additional_fields: populateAdditionalFields(user)
-        }));
+        UserStore.onSignOutUser(({user, session}) => {
+            if (session) {
+                this.setState({
+                    name: user.name,
+                    action: 'OUT',
+                    session_time: moment(session.end).diff(session.start),
+                    total_time: DB.getTotalUserTime(user),
+                    additional_fields: populateAdditionalFields(user)
+                })
+            } else {
+                this.setState({
+                    name: user.name,
+                    action: 'DROPPED',
+                    session_time: '',
+                    total_time: '',
+                    additional_fields: ''
+                })
+            }
+        });
     }
 
     render() {

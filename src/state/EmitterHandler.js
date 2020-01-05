@@ -1,6 +1,6 @@
 import MicroEmitter from 'micro-emitter';
 
-class EmitterHandler {
+class ConfigStore {
     constructor() {
         this.event_emitter = new MicroEmitter();
     }
@@ -14,6 +14,6 @@ class EmitterHandler {
     }
 }
 
-let instance = new EmitterHandler();
+let instance = new ConfigStore();
 
 export default instance;

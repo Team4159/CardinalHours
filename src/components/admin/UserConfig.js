@@ -10,6 +10,7 @@ import {
 
 import log from 'electron-log';
 
+import UserStore from '../../state/UserStore'
 import DB from '../../state/DB';
 
 export default class UserConfig extends Component {
@@ -38,6 +39,11 @@ export default class UserConfig extends Component {
     }
 
     handleSaveAllChanges() {
+        let drops = DB.users.filter(user => !this.state.users.includes(user));
+        for (let drop of drops) {
+            UserStore.signOutUser(drop);
+        }
+
         DB.setAndUpdateUsersFile(this.state.users);
     }
 

@@ -77,6 +77,7 @@ class DB {
     }
 
     updateConfigFile() {
+        console.log(this.config);
         log.info('Updating config file...');
         fs.writeFileSync(this.config_filename, JSON.stringify(this.config), err => {err ? console.error(err) : null });
     }
