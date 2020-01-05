@@ -12,7 +12,7 @@ class DB {
     constructor() {
         log.info('Initializing database...');
 
-        this.users_filename = path.join(remote.getGlobal('dataPath'), 'users.json');
+        this.filename = path.join(remote.getGlobal('dataPath'), 'users.json');
         this.fsWait = false;
 
         this.isDev = remote.getGlobal('isDev');
@@ -20,25 +20,16 @@ class DB {
         this.config_filename = path.join(remote.getGlobal('dataPath'), 'config.json');
         this.config = JSON.parse(fs.readFileSync(this.config_filename));
 
-        this.config_filename = path.join(remote.getGlobal('dataPath'), 'config.json');
-        if (fs.existsSync(this.config_filename)) {
-            this.config = JSON.parse(fs.readFileSync(this.config_filename));
+        if (fs.existsSync(this.filename)) {
+            this.users = JSON.parse(fs.readFileSync(this.filename));
         } else {
-            fs.writeFileSync(this.config_filename, JSON.stringify(require('./default_config.json')));
-            this.config = require('./default_config.json');
-        }
-
-        if (fs.existsSync(this.users_filename)) {
-            this.users = JSON.parse(fs.readFileSync(this.users_filename));
-        } else {
-            fs.writeFileSync(this.users_filename, JSON.stringify([]));
+            fs.writeFileSync(this.filename, JSON.stringify([]));
             this.users = [];
         }
 
-        fs.watchFile(this.users_filename, () => {
-            this.users = JSON.parse(fs.readFileSync(this.users_filename));
+        fs.watchFile(this.filename, () => {
+            this.users = JSON.parse(fs.readFileSync(this.filename));
         });
-
 
         this.sheet = new GoogleSpreadsheet(this.config.sheets.sheet_id);
         this.creds = this.config.sheets.creds;
@@ -48,77 +39,6 @@ class DB {
                 this.syncSheets();
             }
         });
-    }
-
-    verifyPassword(password) {
-        return hash.verify(password, this.config.hashed_password);
-    }
-
-    isPasswordNotSet() {
-        return this.config.hashed_password === null || this.config.hashed_password === undefined;
-    }
-
-    setPassword(password) {
-        this.setConfig({
-            ...this.config,
-            'hashed_password': password === null ? null : hash.generate(password)
-        });
-
-        this.updateConfigFile();
-    }
-
-    setAndUpdateConfigFile(config) {
-        this.setConfig(config);
-        this.updateConfigFile();
-    }
-
-    setConfig(config) {
-        this.config = config;
-    }
-
-    updateConfigFile() {
-        console.log(this.config);
-        log.info('Updating config file...');
-        fs.writeFileSync(this.config_filename, JSON.stringify(this.config), err => {err ? console.error(err) : null });
-    }
-
-    setAndUpdateUsersFile(users) {
-        this.setUsers(users);
-        this.updateUsersFile();
-    }
-
-    setUsers(users) {
-        this.users = users;
-    }
-
-    updateUsersFile() {
-        log.info('Updating users file...');
-        fs.writeFileSync(this.users_filename, JSON.stringify(this.users), err => {err ? console.error(err) : null});
-    }
-
-    updateSheets(user) {
-        this.sheet.useServiceAccountAuth(this.creds, () => {
-            this.sheet.getRows(1, (err, rows) => {
-                if (err) return console.error(err);
-
-                const formatTime = millis => (millis / 1000 / 60 / 60).toFixed(2);
-
-                let row = rows.find(row => row.name === user.name);
-
-                row.hours = formatTime(this.getTotalUserTime(user));
-                row.teamdays = this.getTotalUserDays(user);
-
-                for (let day_counter of Object.keys(this.config.day_counters)) {
-                    row[day_counter] = this.getTotalCertainDays(user, this.config.day_counters[day_counter]);
-                }
-
-                for (let hour_counter of Object.keys(this.config.hour_counters)) {
-                    row[hour_counter] = formatTime(this.getTotalTimeInRange(user, this.config.hour_counters[hour_counter]));
-                }
-
-                row.save(err => err ? console.error(err) : null);
-            })
-        })
     }
 
     populateRow(user, headers, row) {
@@ -224,30 +144,6 @@ class DB {
         log.info('Adding session for ' + user.name);
         this.query(user).sessions.push(session);
 
-        this.updateSheets(user);
-        this.updateUsersFile();
-    }
-
-    query(query) {
-        return this.users.find(user => Object.keys(query)
-            .every(key => query[key] === user[key])
-        );
-    }
-
-    getTotalTime(sessions) {
-        return sessions.reduce((acc, cur) => acc + moment(cur.end).diff(moment(cur.start)), 0);
-    }
-
-    getTotalUserTime(user) {
-        user = this.query(user);
-        return (user.imported_hours ? moment.duration(user.imported_hours, 'hours') : 0) + this.getTotalTime(user.sessions);
-    }
-
-    getTotalTimeInRange(user, start, end) {
-        user = this.query(user);
-        start = moment(start);
-        end = moment(end);
-        return this.getTotalTime(user.sessions.filter(session => moment(session.start).isBetween(start, end)));
         if (!this.isDev) {
             this.syncSheets(user);
         }
@@ -262,18 +158,65 @@ class DB {
         }
     }
 
-    getTotalUserDays(user) {
-        user = this.query(user);
-        return this.getTotalDays(user.sessions);
+    query(query) {
+        return this.users.find(user => Object.keys(query)
+            .every(key => query[key] === user[key])
+        );
     }
 
-    getTotalCertainDays(user, day) {
-        user = this.query(user);
-        return (day === 5 && user.imported_meetings ? user.imported_meetings : 0) + this.getTotalDays(user.sessions.filter(session => moment(session.start).isoWeekday() == day));
+    getTotalTime(sessions) {
+        return sessions.reduce((acc, cur) => acc + moment(cur.end).diff(moment(cur.start)), 0);
     }
 
     getTotalDays(sessions) {
         return sessions.filter((session, index) => index === 0 || !moment(session.start).isSame(moment(sessions[index - 1].start), 'day')).length;
+    }
+
+    setUsers(users) {
+        this.users = users;
+    }
+
+    updateUsersFile() {
+        log.info('Updating users file...');
+        fs.writeFileSync(this.filename, JSON.stringify(this.users));
+    }
+
+    setConfig(config) {
+        this.config = config;
+    }
+
+    updateConfigFile() {
+        log.info('Updating config file...');
+        fs.writeFileSync(this.config_filename, JSON.stringify(this.config));
+    }
+
+    setAndUpdateConfigFile(config) {
+        this.setConfig(config);
+        this.updateConfigFile();
+    }
+
+    setAndUpdateUsersFile(users) {
+        this.setUsers(users);
+        this.updateUsersFile();
+    }
+
+    setPassword(password) {
+        let hashed_password = password ?  hash.generate(password) : null;
+
+        console.log(password + ", " + hashed_password);
+
+        this.setAndUpdateConfigFile({
+            ...this.config,
+            'hashed_password': hashed_password,
+        });
+    }
+
+    verifyPassword(password) {
+        return hash.verify(password, this.config.hashed_password);
+    }
+
+    isPasswordNotSet() {
+        return !hash.isHashed(this.config.hashed_password);
     }
 }
 

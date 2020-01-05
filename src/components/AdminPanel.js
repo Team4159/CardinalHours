@@ -142,13 +142,10 @@ export default class AdminPanel extends Component {
                                 </div>
                                 <br/>
                                 <Button
-                                    color='warning'
+                                    color='danger'
                                     onClick={this.resetConfig}
                                 >Reset</Button>
                                 {' '}
-                                <Button
-                                    onClick={this.handleCloseModal}
-                                >Exit</Button>
                             </div>
                             :
                             <div>
@@ -160,7 +157,9 @@ export default class AdminPanel extends Component {
                                 </InputGroup>
                             </div>
                     }
-
+                    <Button
+                        onClick={this.handleCloseModal}
+                    >Exit</Button>
                 </ReactModal>
             </div>
         );
