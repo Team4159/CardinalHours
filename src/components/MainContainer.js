@@ -5,8 +5,6 @@ import {
     Col
 } from 'reactstrap';
 
-import MicroEmitter from 'micro-emitter';
-
 import TimeTable from './TimeTable';
 import UserDisplay from './UserDisplay';
 import LastActionDisplay from './LastActionDisplay';

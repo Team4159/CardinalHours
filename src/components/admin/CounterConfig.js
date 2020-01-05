@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {
     Button,
     Input,
-    InputGroup
+    InputGroup, InputGroupAddon, InputGroupText
 } from 'reactstrap';
 
 import moment from 'moment';
@@ -116,17 +116,23 @@ export default class CounterConfig extends Component {
                                         key={this.getKey()}
                                     >
                                         <InputGroup>
+                                            <InputGroupAddon addonType='prepend'>
+                                                <InputGroupText>Start Date</InputGroupText>
+                                            </InputGroupAddon>
                                             <Input
                                             name={counter}
-                                            placeholder={counter + 'start date'}
+                                            placeholder={counter + ' start date'}
                                             value={this.state.config.hour_counters[counter][0]}
                                             onChange={event => this.handleChange(event, 'hour_counters', 0)}
                                             />
                                         </InputGroup>
                                         <InputGroup>
+                                            <InputGroupAddon addonType='prepend'>
+                                                <InputGroupText>End Date</InputGroupText>
+                                            </InputGroupAddon>
                                             <Input
                                             name={counter}
-                                            placeholder={counter + 'end date'}
+                                            placeholder={counter + ' end date'}
                                             value={this.state.config.hour_counters[counter][1]}
                                             onChange={event => this.handleChange(event, 'hour_counters', 1)}
                                             />
@@ -156,28 +162,35 @@ export default class CounterConfig extends Component {
                                             key={this.getKey()}
                                         >
                                             <InputGroup>
+                                                <InputGroupAddon addonType='prepend'>
+                                                    <InputGroupText>Start Date</InputGroupText>
+                                                </InputGroupAddon>
                                                 <Input
-
                                                     name={counter}
-                                                    placeholder={counter + 'start date'}
+                                                    placeholder={counter + ' start date'}
                                                     value={this.state.config.day_counters[counter][0]}
                                                     onChange={event => this.handleChange(event, 'day_counters', 0)}
                                                 />
                                             </InputGroup>
                                             <InputGroup>
+                                                <InputGroupAddon addonType='prepend'>
+                                                    <InputGroupText>End Date</InputGroupText>
+                                                </InputGroupAddon>
                                                 <Input
                                                     name={counter}
-                                                    placeholder={counter + 'end date'}
+                                                    placeholder={counter + ' end date'}
                                                     value={this.state.config.day_counters[counter][1]}
                                                     onChange={event => this.handleChange(event, 'day_counters', 1)}
                                                 />
                                             </InputGroup>
-                                        </div>
-                                        :
+                                        </div> :
                                         <div
                                             key={this.getKey()}
                                         >
                                             <InputGroup>
+                                                <InputGroupAddon addonType='prepend'>
+                                                    <InputGroupText>Day</InputGroupText>
+                                                </InputGroupAddon>
                                                 <Input
                                                     name={counter}
                                                     placeholder={'Day of ' + counter}
