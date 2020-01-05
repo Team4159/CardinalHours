@@ -8,7 +8,7 @@ import {
     InputGroupText
 } from 'reactstrap';
 
-import EmitterHandler from '../../state/EmitterHandler';
+import EmitterHandler from '../../state/ConfigStore';
 import DB from '../../state/DB';
 
 export default class MiscConfig extends Component {

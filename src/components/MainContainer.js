@@ -12,7 +12,7 @@ import UserDisplay from './UserDisplay';
 import LastActionDisplay from './LastActionDisplay';
 import AdminPanel from './AdminPanel';
 
-import EmitterHandler from '../state/EmitterHandler';
+import EmitterHandler from '../state/ConfigStore';
 import DB from '../state/DB';
 
 export default class MainContainer extends Component {
