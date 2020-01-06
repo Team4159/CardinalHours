@@ -154,7 +154,9 @@ class DB {
         if (typeof filter === 'string') {
             return sessions.filter(session => moment(session.start).weekday() === moment.weekdays().indexOf(filter));
         } else if (Array.isArray(filter)) {
-            return sessions.filter(session => moment(session.start).isBetween(moment(filter[0]), moment(filter[1])));
+            return sessions.filter(session => moment(session.start).isBetween(filter[0], filter[1]));
+        } else if (typeof filter === 'number') {
+            return sessions.filter(session => moment(session.start).isoWeekday() == filter);
         }
     }
 
