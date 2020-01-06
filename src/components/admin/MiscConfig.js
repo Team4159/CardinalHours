@@ -8,7 +8,7 @@ import {
     InputGroupText
 } from 'reactstrap';
 
-import EmitterHandler from '../../state/ConfigStore';
+import ConfigStore from '../../state/ConfigStore';
 import DB from '../../state/DB';
 
 export default class MiscConfig extends Component {
@@ -29,12 +29,9 @@ export default class MiscConfig extends Component {
     }
 
     toggleSignUps() {
-        DB.setAndUpdateConfigFile({
-            ...DB.config,
-            'sign_ups': !DB.config.sign_ups
-        });
+        DB.setAndUpdateConfigFile(!DB.config['sign_ups'], 'sign_ups');
 
-        EmitterHandler.refreshMainContainer();
+        ConfigStore.refreshMainContainer();
         this.forceUpdate();
     }
 

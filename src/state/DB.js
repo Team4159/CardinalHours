@@ -172,17 +172,9 @@ class DB {
         return sessions.filter((session, index) => index === 0 || !moment(session.start).isSame(moment(sessions[index - 1].start), 'day')).length;
     }
 
-    setUsers(users) {
-        this.users = users;
-    }
-
     updateUsersFile() {
         log.info('Updating users file...');
         fs.writeFileSync(this.filename, JSON.stringify(this.users));
-    }
-
-    setConfig(config) {
-        this.config = config;
     }
 
     updateConfigFile() {
@@ -190,20 +182,23 @@ class DB {
         fs.writeFileSync(this.config_filename, JSON.stringify(this.config));
     }
 
-    setAndUpdateConfigFile(config) {
-        this.setConfig(config);
+    setAndUpdateConfigFile(value, key) {
+        if (key === undefined) {
+            this.config = value;
+        } else {
+            this.config[key] = value;
+        }
+
         this.updateConfigFile();
     }
 
     setAndUpdateUsersFile(users) {
-        this.setUsers(users);
+        this.users = users;
         this.updateUsersFile();
     }
 
     setPassword(password) {
         let hashed_password = password ?  hash.generate(password) : null;
-
-        console.log(password + ", " + hashed_password);
 
         this.setAndUpdateConfigFile({
             ...this.config,

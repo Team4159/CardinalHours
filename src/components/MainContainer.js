@@ -10,14 +10,14 @@ import UserDisplay from './UserDisplay';
 import LastActionDisplay from './LastActionDisplay';
 import AdminPanel from './AdminPanel';
 
-import EmitterHandler from '../state/ConfigStore';
+import ConfigStore from '../state/ConfigStore';
 import DB from '../state/DB';
 
 export default class MainContainer extends Component {
     constructor(props) {
         super(props);
 
-        EmitterHandler.onRefreshMainContainer(_ =>
+        ConfigStore.onRefreshMainContainer(_ =>
             this.refreshMainContainer()
         );
     }
