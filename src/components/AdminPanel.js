@@ -88,7 +88,7 @@ export default class AdminPanel extends Component {
     render() {
         return (
             <div>
-                <Button onClick={this.handleOpenModal}>Admin Panel</Button>
+                <Button onClick={this.handleOpenModal}>Settings</Button>
                 <ReactModal
                     isOpen={this.state.show_modal}
                     ariaHideApp={false}
@@ -136,8 +136,8 @@ export default class AdminPanel extends Component {
                                     {
                                         this.state.pagination === 'COUNTER' ? <CounterConfig/> :
                                             this.state.pagination === 'USERS' ? <UserConfig/> :
-                                                this.state.pagination === 'MISC' ?
-                                                    <MiscConfig/> : null
+                                                this.state.pagination === 'MISC' ? <MiscConfig/> :
+                                                    null
                                     }
                                 </div>
                                 <br/>

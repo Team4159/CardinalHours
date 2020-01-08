@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import {
     Button,
+    ButtonGroup,
     Input,
-    InputGroup, InputGroupAddon, InputGroupText
+    InputGroup,
+    InputGroupAddon,
+    InputGroupText
 } from 'reactstrap';
 
 import moment from 'moment';
@@ -66,7 +69,7 @@ export default class CounterConfig extends Component {
         let updated_counter = {
             ...this.state.config[counter_type],
             [event.target.name]: index === undefined ?
-                parseInt(event.target.value) || 0 :
+                event.target.value :
                 Object.assign([], this.state.config[counter_type][event.target.name], {[index]: event.target.value})
         };
 
@@ -187,17 +190,26 @@ export default class CounterConfig extends Component {
                                         <div
                                             key={this.getKey()}
                                         >
-                                            <InputGroup>
-                                                <InputGroupAddon addonType='prepend'>
-                                                    <InputGroupText>Day</InputGroupText>
-                                                </InputGroupAddon>
-                                                <Input
-                                                    name={counter}
-                                                    placeholder={'Day of ' + counter}
-                                                    value={this.state.config.day_counters[counter]}
-                                                    onChange={event => this.handleChange(event, 'day_counters')}
-                                                />
-                                            </InputGroup>
+                                           <ButtonGroup>
+                                               {
+                                                   Array(7).fill().map((_, idx) =>
+                                                     <Button
+                                                         outline
+                                                         size='sm'
+                                                         key={this.getKey()}
+                                                         value={moment().isoWeekday(idx).format('dddd')}
+                                                         name={counter}
+                                                         color={moment().isoWeekday(this.state.config.day_counters[counter]).format('dddd') ===
+                                                                moment().isoWeekday(idx).format('dddd') ? 'primary' : 'secondary'}
+                                                         onClick={event => this.handleChange(event, 'day_counters')}
+                                                     >
+                                                         {
+                                                             moment().isoWeekday(idx).format('dddd')
+                                                         }
+                                                     </Button>
+                                                   )
+                                               }
+                                           </ButtonGroup>
                                             <p>
                                                 {
                                                     moment().isoWeekday(this.state.config.day_counters[counter]).format('dddd')

@@ -18,7 +18,12 @@ class DB {
         this.isDev = remote.getGlobal('isDev');
 
         this.config_filename = path.join(remote.getGlobal('dataPath'), 'config.json');
-        this.config = JSON.parse(fs.readFileSync(this.config_filename));
+
+        if (fs.existsSync(this.filename)) {
+            this.setAndUpdateConfigFile(require('./default_config'));
+        } else {
+            this.config = JSON.parse(fs.readFileSync(this.config_filename));
+        }
 
         if (fs.existsSync(this.filename)) {
             this.users = JSON.parse(fs.readFileSync(this.filename));
