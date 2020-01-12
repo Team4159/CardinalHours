@@ -50,5 +50,18 @@
     "webpack": "^4.28.2",
     "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.1.14"
-  }
+  },
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Team4159/CardinalHours.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Team4159/CardinalHours/issues"
+  },
+  "homepage": "https://github.com/Team4159/CardinalHours#readme",
+  "description": ""
 }

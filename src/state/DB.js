@@ -36,7 +36,7 @@ class DB {
             this.users = JSON.parse(fs.readFileSync(this.filename));
         });
 
-        this.sheet = new GoogleSpreadsheet(this.config.sheets['sheet_id']);
+        this.sheet = new GoogleSpreadsheet(this.config.sheets.sheet_id);
         this.creds = this.config.sheets.creds;
         this.checkAuth(err => {
             if (err) return log.error('Failed to refresh authentication: ' + err);
@@ -77,7 +77,7 @@ class DB {
                 if (err) cb(err);
                 this.sheet.getInfo((err, info) => {
                     if (err) cb(err);
-                    this.worksheet = info.worksheets[this.config.sheets['worksheet_id'] - 1];
+                    this.worksheet = info.worksheets[this.config.sheets.worksheet_id - 1];
                     cb(null);
                 });
             });
