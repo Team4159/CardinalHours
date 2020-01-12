@@ -20,7 +20,7 @@ class DB {
         this.config_filename = path.join(remote.getGlobal('dataPath'), 'config.json');
 
         if (fs.existsSync(this.filename)) {
-            this.setAndUpdateConfigFile(require('./default_config'));
+            this.setAndUpdateConfigFile(require('./default_config.json'));
         } else {
             this.config = JSON.parse(fs.readFileSync(this.config_filename));
         }
@@ -36,7 +36,7 @@ class DB {
             this.users = JSON.parse(fs.readFileSync(this.filename));
         });
 
-        this.sheet = new GoogleSpreadsheet(this.config.sheets.sheet_id);
+        this.sheet = new GoogleSpreadsheet(this.config.sheets['sheet_id']);
         this.creds = this.config.sheets.creds;
         this.checkAuth(err => {
             if (err) return log.error('Failed to refresh authentication: ' + err);
@@ -77,7 +77,7 @@ class DB {
                 if (err) cb(err);
                 this.sheet.getInfo((err, info) => {
                     if (err) cb(err);
-                    this.worksheet = info.worksheets[this.config.sheets.worksheet_id - 1];
+                    this.worksheet = info.worksheets[this.config.sheets['worksheet_id'] - 1];
                     cb(null);
                 });
             });
@@ -205,12 +205,9 @@ class DB {
     }
 
     setPassword(password) {
-        let hashed_password = password ?  hash.generate(password) : null;
+        let hashed_password = password ? hash.generate(password) : null;
 
-        this.setAndUpdateConfigFile({
-            ...this.config,
-            'hashed_password': hashed_password,
-        });
+        this.setAndUpdateConfigFile(hashed_password, 'hashed_password')
     }
 
     verifyPassword(password) {
