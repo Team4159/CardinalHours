@@ -112,7 +112,7 @@ export default class MiscConfig extends Component {
                                        onChange={e => this.handlePasswordChange(e, 'confirm_password')}/>
                             </InputGroup>
                             <Button size='sm' onClick={this.handlePasswordSubmit}
-                                    color={this.state.new_password === this.state.confirm_password ? 'success' : 'warning'}>{DB.isPasswordNotSet() ? 'Set Password' : 'Submit New Password'}</Button>
+                                    color={this.state.new_password !== '' && this.state.new_password === this.state.confirm_password ? 'success' : 'warning'}>{DB.isPasswordNotSet() ? 'Set Password' : 'Submit New Password'}</Button>
                         </div> : null
                 }
             </div>

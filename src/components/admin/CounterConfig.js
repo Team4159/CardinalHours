@@ -52,32 +52,30 @@ export default class CounterConfig extends Component {
     }
 
     isConfigValid() {
-        return Object.values({...this.state.config.hour_counters, ...this.state.config.day_counters}).every(
-            counter => counter.constructor === Array ? counter.every(date => moment(date).isValid()) : typeof counter === 'string' || typeof counter === 'number');
+        return Object.values(this.state.config.hour_counters).every(
+                counter => counter.every(date => moment(date).isValid()))
+            && Object.values(this.state.config.day_counters).every(
+                counter => counter.constructor === Array ? counter.every(date => moment(date).isValid()) : typeof counter === 'string' || typeof counter === 'number');
     }
 
-    handleClick(type, counter) {
+    handleClick(event, counter) {
+        let counter_obj = this.state[event.target.name];
+        counter_obj[counter] = !counter_obj[counter];
         this.setState({
-            [type]: {
-                ...this.state[type],
-                [counter]: !this.state[type][counter]
-            }
+            [event.target.name]: counter_obj,
         });
     }
 
     handleChange(event, counter_type, index) {
-        let updated_counter = {
-            ...this.state.config[counter_type],
-            [event.target.name]: index === undefined ?
-                event.target.value :
-                Object.assign([], this.state.config[counter_type][event.target.name], {[index]: event.target.value})
-        };
+        let updated_counter = this.state.config[counter_type];
+        updated_counter[event.target.name] = index === undefined ?
+                 event.target.value :
+                 Object.assign([], this.state.config[counter_type][event.target.name], {[index]: event.target.value});
+        let updated_config = this.state.config;
+        updated_config[counter_type] = updated_counter;
 
         this.setState({
-            config: {
-                ...this.state.config,
-                [counter_type]: updated_counter
-            }
+            config: updated_config
         });
     }
 
@@ -106,9 +104,10 @@ export default class CounterConfig extends Component {
                             [<Button
                                 key={this.getKey()}
                                 size='sm'
+                                name='hour_counters'
                                 outline
                                 color='primary'
-                                onClick={() => this.handleClick('hour_counters', counter)}>
+                                onClick={event => this.handleClick(event, counter)}>
                                 {counter}
                             </Button>,
                                 <br
@@ -151,9 +150,10 @@ export default class CounterConfig extends Component {
                             [<Button
                                 key={this.getKey()}
                                 size='sm'
+                                name='day_counters'
                                 outline
                                 color='primary'
-                                onClick={() => this.handleClick('day_counters', counter)}>
+                                onClick={(event) => this.handleClick(event, counter)}>
                                 {counter}
                             </Button>,
                                 <br

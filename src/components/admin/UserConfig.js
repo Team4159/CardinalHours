@@ -39,7 +39,7 @@ export default class UserConfig extends Component {
     }
 
     handleSaveAllChanges() {
-        let drops = DB.users.filter(user => !this.state.users.includes(user));
+        let drops = DB.users.filter(user => this.state.users.includes(local_user => local_user.name === user.name));
         for (let drop of drops) {
             UserStore.signOutUser(drop);
         }
@@ -48,11 +48,10 @@ export default class UserConfig extends Component {
     }
 
     handleSaveChangesToUser() {
-        let user = {
-            ...this.state.selected_user,
-            ...{'name': this.state.selected_user_name},
-            ...{'id': this.state.selected_user_id}
-        };
+        let user = this.state.selected_user;
+
+        user['name'] = this.state.selected_user_name;
+        user['id'] = this.state.selected_user_id;
 
         let users = this.state.users;
         users[this.state.users.indexOf(this.state.selected_user)] = user;
