@@ -19,10 +19,10 @@ class DB {
 
         this.config_filename = path.join(remote.getGlobal('dataPath'), 'config.json');
 
-        if (fs.existsSync(this.filename)) {
-            this.setAndUpdateConfigFile(require('./default_config.json'));
-        } else {
+        if (fs.existsSync(this.config_filename)) {
             this.config = JSON.parse(fs.readFileSync(this.config_filename));
+        } else {
+            this.setAndUpdateConfigFile(require('./default_config.json'));
         }
 
         if (fs.existsSync(this.filename)) {
