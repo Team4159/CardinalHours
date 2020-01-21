@@ -5,7 +5,8 @@ import {
     Input,
     InputGroup,
     InputGroupAddon,
-    InputGroupText
+    InputGroupText,
+    Badge
 } from 'reactstrap';
 
 const edge_format = 'MMM Do, YYYY HH:mm a';
@@ -98,9 +99,14 @@ export default class SessionsConfig extends Component {
                                             this.props.sessions.map((session, idx) =>
                                                 <div key={idx}>
                                                     {
-                                                        moment(session.start).format(edge_format) + " - " + moment(session.end).format(edge_format) + ": " +
-                                                        moment(session.end).diff(moment(session.start), 'hours', true).toFixed(2) + " "
+                                                        moment(session.start).format(edge_format) + " - " + moment(session.end).format(edge_format) + " "
                                                     }
+                                                    <Badge>
+                                                        {
+                                                            moment(session.end).diff(moment(session.start), 'hours', true).toFixed(2) + " Hours "
+                                                        }
+                                                    </Badge>
+                                                    {' '}
                                                     <Button outline
                                                             size='sm'
                                                             color='danger'
