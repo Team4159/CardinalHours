@@ -7,6 +7,7 @@ import hash from 'password-hash';
 import moment from 'moment';
 import GoogleSpreadsheet from 'google-spreadsheet';
 import { remote } from 'electron';
+import UserStore from "./UserStore";
 
 class DB {
     constructor() {
@@ -199,8 +200,15 @@ class DB {
         this.updateConfigFile();
     }
 
-    setAndUpdateUsersFile(users) {
-        this.users = users;
+    updateUser(original_name, updated_user) {
+        this.users[this.users.find(user => user.name === original_name)] = updated_user;
+        this.updateUsersFile();
+    }
+
+    dropUser(dropped_user) {
+        UserStore.signOutUser(dropped_user);
+
+        this.users = this.users.filter(user => user.name !== dropped_user.name);
         this.updateUsersFile();
     }
 
