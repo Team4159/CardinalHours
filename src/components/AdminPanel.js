@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component, Fragment } from 'react';
 import ReactModal from 'react-modal';
 import {
     Button,
@@ -12,9 +12,9 @@ import {
     Badge
 } from 'reactstrap';
 
-import CounterConfig from './admin/CounterConfig';
-import MiscConfig from './admin/MiscConfig';
-import UserConfig from './admin/UserConfig';
+import CounterConfig from './admin/counter/CounterConfig';
+import MiscConfig from './admin/miscellaneous/MiscConfig';
+import UserConfig from './admin/user/UserConfig';
 
 import DB from '../state/DB'
 
@@ -87,7 +87,7 @@ export default class AdminPanel extends Component {
 
     render() {
         return (
-            <div>
+            <Fragment>
                 <Button onClick={this.handleOpenModal}>Settings</Button>
                 <ReactModal
                     isOpen={this.state.show_modal}
@@ -161,7 +161,7 @@ export default class AdminPanel extends Component {
                         onClick={this.handleCloseModal}
                     >Exit</Button>
                 </ReactModal>
-            </div>
+            </Fragment>
         );
     }
 }

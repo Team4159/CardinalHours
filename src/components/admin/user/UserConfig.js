@@ -12,7 +12,7 @@ import log from 'electron-log';
 
 import SessionsConfig from './SessionsConfig';
 
-import DB from '../../state/DB';
+import DB from '../../../state/DB';
 
 export default class UserConfig extends Component {
     constructor(props) {

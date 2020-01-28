@@ -225,6 +225,66 @@ class DB {
     isPasswordNotSet() {
         return !hash.isHashed(this.config.hashed_password);
     }
+
+    /*
+     * returns all 'counter labels'
+     *
+     * counter label is object consisting of
+     * name: name of counter
+     * type: type of counter ("hour_counters" OR "day_counters")
+     */
+    getCounterLabels() {
+        let counter_labels = [];
+
+        for (let counter_name of Object.keys(this.config.day_counters)) {
+            counter_labels.push({
+                name: counter_name,
+                type: 'day_counters'
+            })
+        }
+
+        for (let counter_name of Object.keys(this.config.hour_counters)) {
+            counter_labels.push({
+                name: counter_name,
+                type: 'hour_counters'
+            })
+        }
+
+        return counter_labels;
+    }
+
+    /*
+     * set counter of:
+     * type TYPE ("hour_counters" OR "day_counters")
+     * name NAME
+     * start date START or day name START
+     * end date END or UNDEFINED if counter is for specific day
+     */
+    setCounter(type, name, start, end) {
+        if (end === undefined) {
+            this.config[type][name]= start;
+        } else {
+            this.config[type][name] = [start, end];
+        }
+    }
+
+    /*
+     * return ARRAY [START, END] or STRING "DAY"
+     */
+    getCounterValue(type, name) {
+        return this.config[type][name];
+    }
+
+    /*
+     * return TRUE if counter is for range of dates, FALSE if counter is for specific day
+     */
+    isCounterRange(type, name) {
+        return this.config[type][name] instanceof Array;
+    }
+
+    isDateValid(date_string) {
+        return moment(date_string).isValid();
+    }
 }
 
 let instance = new DB();

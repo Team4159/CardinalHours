@@ -6,11 +6,19 @@ class ConfigStore {
     }
 
     onRefreshMainContainer(handler) {
-        this.event_emitter.on('refreshMainContainer', handler)
+        this.event_emitter.on('refreshMainContainer', handler);
     }
 
     refreshMainContainer() {
         this.event_emitter.emit('refreshMainContainer');
+    }
+
+    onRefreshCounterConfigRadio(handler) {
+        this.event_emitter.on('refreshCounterConfigRadio', handler);
+    }
+
+    refreshCounterConfigRadio() {
+        this.event_emitter.emit('refreshCounterConfigRadio');
     }
 }
 

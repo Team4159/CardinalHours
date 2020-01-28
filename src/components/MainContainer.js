@@ -18,12 +18,8 @@ export default class MainContainer extends Component {
         super(props);
 
         ConfigStore.onRefreshMainContainer(_ =>
-            this.refreshMainContainer()
+            this.forceUpdate(),
         );
-    }
-
-    refreshMainContainer() {
-        this.forceUpdate();
     }
 
     render() {

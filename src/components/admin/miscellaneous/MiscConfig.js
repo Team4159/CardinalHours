@@ -8,8 +8,8 @@ import {
     InputGroupText
 } from 'reactstrap';
 
-import ConfigStore from '../../state/ConfigStore';
-import DB from '../../state/DB';
+import ConfigStore from '../../../state/ConfigStore';
+import DB from '../../../state/DB';
 
 export default class MiscConfig extends Component {
     constructor(props) {
