@@ -153,6 +153,21 @@ class DB {
         if (!this.isDev) {
             this.syncSheets(user);
         }
+
+        this.updateUsersFile();
+    }
+
+    removeSession(user, removed_session) {
+        log.info('Removing session ' + removed_session.start + ' - ' + removed_session.end + ' for ' + user.name);
+
+        let sessions =  this.query(user).sessions;
+        sessions.splice(sessions.findIndex(session => session.end === removed_session.end), 1);
+
+        if (!this.isDev) {
+            this.syncSheets(user);
+        }
+
+        this.query(user).sessions = sessions;
         this.updateUsersFile();
     }
 
@@ -198,18 +213,6 @@ class DB {
         }
 
         this.updateConfigFile();
-    }
-
-    updateUser(original_name, updated_user) {
-        this.users[this.users.find(user => user.name === original_name)] = updated_user;
-        this.updateUsersFile();
-    }
-
-    dropUser(dropped_user) {
-        UserStore.signOutUser(dropped_user);
-
-        this.users = this.users.filter(user => user.name !== dropped_user.name);
-        this.updateUsersFile();
     }
 
     setPassword(password) {
@@ -266,6 +269,8 @@ class DB {
         } else {
             this.config[type][name] = [start, end];
         }
+
+        this.updateConfigFile();
     }
 
     /*
@@ -282,8 +287,45 @@ class DB {
         return this.config[type][name] instanceof Array;
     }
 
+    /*
+     * return TRUE if date_string is valid date
+     */
     isDateValid(date_string) {
         return moment(date_string).isValid();
+    }
+
+    /*
+     * return array of STRING user names
+     */
+    getUserNames() {
+        return this.users.map(user => user.name);
+    }
+
+    /*
+     * finds user with name ORIGINAL_NAME and sets its
+     * NAME to NEW_NAME
+     * ID to NEW_ID
+     * NAME to NEW_SESSIONS
+     */
+    setUser(original_name, new_name, new_id, new_sessions) {
+        const idx = this.users.findIndex(user => user.name === original_name);
+
+        this.users[idx].name = new_name;
+        this.users[idx].id = new_id;
+        this.users[idx].sessions = new_sessions;
+    }
+
+
+    /*
+     * finds and drops user with name NAME
+     */
+    dropUser(name) {
+        const drop = this.query({name: name});
+
+        UserStore.signOutUser(drop);
+
+        this.users = this.users.filter(user => user.name !== drop.name);
+        this.updateUsersFile();
     }
 }
 

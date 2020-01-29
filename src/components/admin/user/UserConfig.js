@@ -1,7 +1,8 @@
-import React, {Component} from 'react';
+import React, { Component, Fragment } from 'react';
 import Select from 'react-dropdown-select';
 import {
     Button,
+    ButtonGroup,
     Input,
     InputGroup,
     InputGroupAddon,
@@ -10,7 +11,7 @@ import {
 
 import log from 'electron-log';
 
-import SessionsConfig from './SessionsConfig';
+import SessionsInput from './SessionsInput';
 
 import DB from '../../../state/DB';
 
@@ -18,153 +19,186 @@ export default class UserConfig extends Component {
     constructor(props) {
         super(props);
 
-        let user_names = DB.users.map(user => user.name);
-
         this.state = {
-            users: user_names,
-            search: '',
+            names: DB.getUserNames(),
+            original_name: null,
 
-            user_original_name: null,
-            user_name: null,
-            user_id: null,
-            user_sessions: null,
+            name: null,
+            id: null,
+            sessions: null,
+
+            selected_pane: 'user_details',
         };
 
-        this.handleSelectUser = this.handleSelectUser.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.handleDropUser = this.handleDropUser.bind(this);
+
+        this.handleSelectUser = this.handleSelectUser.bind(this);
         this.handleSaveUser = this.handleSaveUser.bind(this);
+        this.handleDropUser = this.handleDropUser.bind(this);
 
-        this.handleRemoveSession = this.handleRemoveSession.bind(this);
         this.handleAddSession = this.handleAddSession.bind(this);
-    }
+        this.handleRemoveSession = this.handleRemoveSession.bind(this);
 
-    handleSaveUser() {
-        let user = DB.query({
-            name: this.state.user_original_name
-        });
+        this.handleSetPane = this.handleSetPane.bind(this);
 
-        user.name = this.state.user_name;
-        user.id = this.state.user_id;
-
-        DB.updateUser(this.state.user_original_name, user);
-    }
-
-    handleDropUser() {
-        let user_names = this.state.users.filter(user => user !== this.state.user_original_name);
-
-        let dropped_user = DB.query({
-            name: this.state.user_original_name
-        });
-
-        this.setState({
-            users: user_names,
-
-            user_original_name: null,
-            user_name: null,
-            user_id: null,
-            user_sessions: null,
-
-            sessions_opened: false,
-        });
-
-        DB.dropUser(dropped_user);
     }
 
     handleChange(event) {
         this.setState({
-            [event.target.name]: event.target.value
-        });
+            [event.target.name]: event.target.value,
+        })
     }
 
     handleSelectUser(name) {
-        let user = DB.query({
+        const user = DB.query({
             name: name
         });
 
         if (user) {
             this.setState({
-                user_original_name: user.name,
-                user_name: user.name,
-                user_id: user.id,
-                user_sessions: user.sessions,
+                original_name: user.name,
+
+                name: user.name,
+                id: user.id,
+                sessions: user.sessions,
+
                 sessions_opened: false,
             });
         } else {
-            log.error('User not found:' + name);
+            log.error('User not found: ' + name);
         }
     }
 
-    handleRemoveSession(removed_session) {
-        let updated_sessions = this.state.user_sessions;
-        updated_sessions.splice(this.state.user_sessions.findIndex(session => session.end === removed_session.end), 1);
+    handleSaveUser() {
+        DB.setUser(
+            this.state.original_name,
+            this.state.name,
+            this.state.id,
+            this.state.sessions
+        );
 
         this.setState({
-            user_sessions: updated_sessions
+            names: DB.getUserNames(),
+            original_name: this.state.name,
         });
     }
 
-    handleAddSession(start, end) {
-        const session = {
-            start: start,
-            end: end
+    handleDropUser() {
+        DB.dropUser(this.state.original_name);
+
+        this.setState( {
+            names: DB.getUserNames(),
+            original_name: null,
+
+            name: null,
+            id: null,
+            sessions: null,
+        });
+    }
+
+    handleAddSession(session) {
+        const user = {
+            name: this.state.original_name,
         };
 
-        let updated_sessions = this.state.user_sessions;
-        updated_sessions.push(session);
+        DB.addSession(user, session);
 
+        this.handleSelectUser(this.state.original_name);
+    }
+
+    handleRemoveSession(session) {
+        const user = {
+            name: this.state.original_name,
+        };
+
+        DB.removeSession(user, session);
+
+        this.handleSelectUser(this.state.original_name);
+    }
+
+    handleSetPane(event) {
         this.setState({
-            user_sessions: updated_sessions
-        })
+            selected_pane: event.target.name,
+        });
     }
 
     render() {
         return (
-            <div>
+            <Fragment>
                 <Select
-                    options={this.state.users.reduce((acc, cur) => {
-                        acc.push({
-                            label: cur,
-                        });
-                        return acc
-                    }, [])}
+                    options=
+                        {
+                            this.state.names.reduce((acc, cur) => {
+                                acc.push({
+                                    label: cur,
+                                });
+                                return acc
+                            }, [])
+                        }
                     onChange={value => this.handleSelectUser(value[0].label)}
                 />
                 <br/>
                 {
-                    this.state.user_original_name ?
-                        <div>
-                            <InputGroup>
-                                <InputGroupAddon
-                                    addonType='prepend'><InputGroupText>Name</InputGroupText></InputGroupAddon>
-                                <Input value={this.state.user_name}
-                                       name='user_name'
-                                       onChange={this.handleChange}/>
-                            </InputGroup>
+                    this.state.original_name ?
+                        <Fragment>
+                            <ButtonGroup>
+                                <Button
+                                    outline
+                                    active={ this.state.selected_pane === 'user_details' }
+                                    color='primary'
+                                    name='user_details'
+                                    onClick={ this.handleSetPane }
+                                >
+                                    User Details
+                                </Button>
+                                <Button
+                                    outline
+                                    active={ this.state.selected_pane === 'sessions_editor' }
+                                    color='primary'
+                                    name='sessions_editor'
+                                    onClick={ this.handleSetPane }
+                                >
+                                    Sessions Editor
+                                </Button>
+                            </ButtonGroup>
+                            {
+                                this.state.selected_pane === 'sessions_editor' ?
+                                    <SessionsInput
+                                        sessions={ this.state.sessions }
+                                        handleRemoveSession={ this.handleRemoveSession }
+                                        handleAddSession={ this.handleAddSession }
+                                    /> :
+                                    <div>
+                                        <InputGroup>
+                                            <InputGroupAddon
+                                                addonType='prepend'><InputGroupText>Name</InputGroupText></InputGroupAddon>
+                                            <Input value={ this.state.name }
+                                                   name='name'
+                                                   onChange={ this.handleChange }/>
+                                        </InputGroup>
+                                        <InputGroup>
+                                            <InputGroupAddon
+                                                addonType='prepend'><InputGroupText>ID</InputGroupText></InputGroupAddon>
+                                            <Input value={ this.state.id }
+                                                   name='id'
+                                                   onChange={ this.handleChange }/>
+                                        </InputGroup>
+                                        <br/>
+                                        <Button color='success'
+                                                onClick={ this.handleSaveUser }
+                                        >
+                                            { "Save Changes to " + this.state.name }
+                                        </Button>
+                                        {' '}
+                                        <Button color='danger' onClick={ this.handleDropUser }>Drop User</Button>
+                                        <br/>
+                                    </div>
+                            }
                             <br/>
-                            <InputGroup>
-                                <InputGroupAddon
-                                    addonType='prepend'><InputGroupText>ID</InputGroupText></InputGroupAddon>
-                                <Input value={this.state.user_id}
-                                       name='user_id'
-                                       onChange={this.handleChange}/>
-                            </InputGroup>
-                            <br/>
-                            <SessionsConfig
-                                sessions={this.state.user_sessions}
-                                handleRemoveSession={this.handleRemoveSession}
-                                handleAddSession={this.handleAddSession}
-                            />
-                            <br/>
-                            <Button color='success'
-                                    onClick={this.handleSaveUser}>{`Save Changes to ${this.state.user_name}`}</Button>
-                            {' '}
-                            <Button color='danger' onClick={this.handleDropUser}>Drop User</Button>
-                            <br/>
-                        </div> : null
+                        </Fragment> : <h5>Select a User!</h5>
                 }
-                <br/>
-            </div>
+
+            </Fragment>
         )
     }
 }
