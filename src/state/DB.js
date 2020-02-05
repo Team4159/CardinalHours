@@ -75,7 +75,7 @@ class DB {
                 if (err) cb(err);
                 this.sheet.getInfo((err, info) => {
                     if (err) cb(err);
-                    this.worksheet = info.worksheets[this.config.sheets.worksheet_id - 1];
+                    this.worksheet = getMainSheet(info);
                     cb(null);
                 });
             });
@@ -113,7 +113,7 @@ class DB {
         this.getCells((err, [headers, cells]) => {
             if (err) return console.error(err);
 
-            const getColumn = header_ => headers.findIndex(header => header.value === header_);
+           const getColumn = header_ => headers.findIndex(header => header.value === header_);
 
             for (let i = headers.length; i < cells.length - headers.length; i += headers.length) {
                 let row = cells.slice(i, i + headers.length);
@@ -166,6 +166,14 @@ class DB {
             .every(key => query[key] === user[key])
         );
     }
+
+	 getMainSheet(info) {
+			for (var sheetIndex = 0; sheetIndex < info.worksheets.length; sheetIndex){
+				if(!this.config.sheets.worksheet_name) break;
+				if(this.config.sheets.worksheet_name === info.worksheets[sheetIndex].title) return sheetIndex;
+			}
+			return this.config.sheets.worksheet_id <= info.worksheets.length ? info.worksheets[this.config.sheets.worksheet_id] : 0;
+	 }
 
     getTotalTime(sessions) {
         return sessions.reduce((acc, cur) => acc + moment(cur.end).diff(moment(cur.start)), 0);
