@@ -78,7 +78,10 @@ class DB {
                 if (err) cb(err);
                 this.sheet.getInfo((err, info) => {
                     if (err) cb(err);
-                    this.worksheet = info.worksheets[this.config.sheets.worksheet_id - 1];
+                    const worksheet_name = this.config.sheets.worksheet_name;
+                    this.worksheet = info.worksheets.find(worksheet => worksheet.title === worksheet_name);
+                    if (!this.worksheet) cb(new Error('Failed to find worksheet with name ' + worksheet_name));
+                    log.info('Found worksheet with name ' + worksheet_name);
                     cb(null);
                 });
             });
@@ -114,9 +117,9 @@ class DB {
     syncSheets() {
         log.info('Syncing Google Sheets...');
         this.getCells((err, [headers, cells]) => {
-            if (err) return console.error(err);
+            if (err) return log.error(err);
 
-            const getColumn = header_ => headers.findIndex(header => header.value === header_);
+           const getColumn = header_ => headers.findIndex(header => header.value === header_);
 
             for (let i = headers.length; i < cells.length - headers.length; i += headers.length) {
                 let row = cells.slice(i, i + headers.length);
