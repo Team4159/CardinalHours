@@ -75,7 +75,7 @@ class DB {
                 if (err) cb(err);
                 this.sheet.getInfo((err, info) => {
                     if (err) cb(err);
-                    this.worksheet = getMainSheet(info);
+                    this.worksheet = this.getMainSheet(info);
                     cb(null);
                 });
             });
@@ -168,7 +168,7 @@ class DB {
     }
 
 	 getMainSheet(info) {
-			for (var sheetIndex = 0; sheetIndex < info.worksheets.length; sheetIndex){
+			for (var sheetIndex = 0; sheetIndex < info.worksheets.length; sheetIndex++) {
 				if(!this.config.sheets.worksheet_name) break;
 				if(this.config.sheets.worksheet_name === info.worksheets[sheetIndex].title) return sheetIndex;
 			}
