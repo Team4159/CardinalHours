@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Table } from 'reactstrap';
+import React, {Component} from 'react';
+import {Table} from 'reactstrap';
 
 import moment from 'moment';
 
@@ -72,7 +72,7 @@ export default class TimeTable extends Component {
             }])
         }));
 
-        UserStore.onSignOutUser(({ user }) => {
+        UserStore.onSignOutUser(({user}) => {
             const index = this.state.sessions.findIndex(session => session.user.id === user.id);
 
             const newSessions = this.state.sessions.slice();
@@ -98,7 +98,7 @@ export default class TimeTable extends Component {
 
         const pad = number => number.toString().length === 1 ? '0' + number : number;
 
-        return `${ pad(hours)  }:${ pad(minutes) }:${ pad(seconds) }`;
+        return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
     }
 
     tick() {
@@ -111,21 +111,21 @@ export default class TimeTable extends Component {
         return (
             <Table className='TimeTable'>
                 <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Time In</th>
-                    </tr>
+                <tr>
+                    <th>Name</th>
+                    <th>Time In</th>
+                </tr>
                 </thead>
                 <tbody>
-                    {
-                        this.state.sessions.sort((a, b) => a.user.name.localeCompare(b.user.name)).map((session, idx) => (
-                            <tr key={ idx }>
-                                <td>{ session.user.name }</td>
-                                <td>{ TimeTable.formatTime(this.state.current_time.diff(moment(session.session.start)) > 0 ?
-                                                                 this.state.current_time.diff(moment(session.session.start)) : 0) }</td>
-                            </tr>
-                        ))
-                    }
+                {
+                    this.state.sessions.sort((a, b) => a.user.name.localeCompare(b.user.name)).map((session, idx) => (
+                        <tr key={idx}>
+                            <td>{session.user.name}</td>
+                            <td>{TimeTable.formatTime(this.state.current_time.diff(moment(session.session.start)) > 0 ?
+                                this.state.current_time.diff(moment(session.session.start)) : 0)}</td>
+                        </tr>
+                    ))
+                }
                 </tbody>
             </Table>
         );
