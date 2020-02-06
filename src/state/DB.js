@@ -156,7 +156,7 @@ class DB {
         log.info('Adding session for ' + user.name);
         this.query(user).sessions.push(session);
 
-        if (this.isDev) {
+        if (!this.isDev) {
             this.syncSheets();
         }
 
