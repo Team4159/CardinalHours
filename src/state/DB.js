@@ -13,12 +13,10 @@ class DB {
     constructor() {
         log.info('Initializing database...');
 
-        this.filename = path.join(remote.getGlobal('dataPath'), 'users.json');
-        this.fsWait = false;
+        this.users_filename = path.join(remote.getGlobal('dataPath'), 'users.json');
+        this.config_filename = path.join(remote.getGlobal('dataPath'), 'config.json');
 
         this.isDev = remote.getGlobal('isDev');
-
-        this.config_filename = path.join(remote.getGlobal('dataPath'), 'config.json');
 
         if (fs.existsSync(this.config_filename)) {
             this.config = JSON.parse(fs.readFileSync(this.config_filename));
@@ -26,15 +24,15 @@ class DB {
             this.setAndUpdateConfigFile(require('./default_config.json'));
         }
 
-        if (fs.existsSync(this.filename)) {
-            this.users = JSON.parse(fs.readFileSync(this.filename));
+        if (fs.existsSync(this.users_filename)) {
+            this.users = JSON.parse(fs.readFileSync(this.users_filename));
         } else {
-            fs.writeFileSync(this.filename, JSON.stringify([]));
+            fs.writeFileSync(this.users_filename, JSON.stringify([]));
             this.users = [];
         }
 
-        fs.watchFile(this.filename, () => {
-            this.users = JSON.parse(fs.readFileSync(this.filename));
+        fs.watchFile(this.users_filename, () => {
+            this.users = JSON.parse(fs.readFileSync(this.users_filename));
         });
 
         this.sheet = new GoogleSpreadsheet(this.config.sheets.sheet_id);
@@ -59,7 +57,7 @@ class DB {
 
         for (let day_counter of Object.keys(this.config.day_counters)) {
             let filter = this.config.day_counters[day_counter];
-            row[getColumn(day_counter)].value = (filter === 'Friday' && user.imported_meetings ? user.imported_meetings : 0) +
+            row[getColumn(day_counter)].value = ((filter === 'Friday' || filter === 5) && user.imported_meetings ? user.imported_meetings : 0) +
                 this.getTotalDays(this.filterSessions(user.sessions, filter));
         }
 
@@ -75,12 +73,12 @@ class DB {
         log.info('Refreshing authentication...');
         if (!this.sheet.isAuthActive()) {
             this.sheet.useServiceAccountAuth(this.creds, err => {
-                if (err) cb(err);
+                if (err) return cb(err);
                 this.sheet.getInfo((err, info) => {
-                    if (err) cb(err);
+                    if (err) return cb(err);
                     const worksheet_name = this.config.sheets.worksheet_name;
                     this.worksheet = info.worksheets.find(worksheet => worksheet.title === worksheet_name);
-                    if (!this.worksheet) cb(new Error('Failed to find worksheet with name ' + worksheet_name));
+                    if (!this.worksheet) return cb(new Error('Failed to find worksheet with name ' + worksheet_name));
                     log.info('Found worksheet with name ' + worksheet_name);
                     cb(null);
                 });
@@ -96,7 +94,7 @@ class DB {
             this.worksheet.getCells({
                 'return-empty': true
             }, (err, cells) => {
-                if (err) cb(err);
+                if (err) return cb(err);
 
                 let rowSize = 0;
                 for (let cell of cells) {
@@ -123,10 +121,15 @@ class DB {
 
             for (let i = headers.length; i < cells.length - headers.length; i += headers.length) {
                 let row = cells.slice(i, i + headers.length);
-                if (row[getColumn('First')].value === '' && row[getColumn('Last')].value === '') {
+                if (row[getColumn('FIRST')].value === '' && row[getColumn('Last')].value === '') {
                     break;
                 }
-                let user = this.query({name: `${ row[getColumn('First')].value } ${ row[getColumn('Last')].value }`});
+                let name = `${ row[getColumn('FIRST')].value } ${ row[getColumn('Last')].value }`;
+                let user = this.query({ name });
+                if (!user) {
+                    log.error('Unable to find ' + name + ' on Google Sheets');
+                    continue;
+                }
                 cells = cells.slice(0, i).concat(this.populateRow(user, headers, row)).concat(cells.slice(i + headers.length));
             }
 
@@ -153,8 +156,8 @@ class DB {
         log.info('Adding session for ' + user.name);
         this.query(user).sessions.push(session);
 
-        if (!this.isDev) {
-            this.syncSheets(user);
+        if (this.isDev) {
+            this.syncSheets();
         }
 
         this.updateUsersFile();
@@ -167,7 +170,7 @@ class DB {
         sessions.splice(sessions.findIndex(session => session.end === removed_session.end), 1);
 
         if (!this.isDev) {
-            this.syncSheets(user);
+            this.syncSheets();
         }
 
         this.query(user).sessions = sessions;
@@ -180,7 +183,7 @@ class DB {
         } else if (Array.isArray(filter)) {
             return sessions.filter(session => moment(session.start).isBetween(filter[0], filter[1]));
         } else if (typeof filter === 'number') {
-            return sessions.filter(session => moment(session.start).isoWeekday() == filter);
+            return sessions.filter(session => moment(session.start).isoWeekday() === filter);
         }
     }
 
@@ -200,7 +203,7 @@ class DB {
 
     updateUsersFile() {
         log.info('Updating users file...');
-        fs.writeFileSync(this.filename, JSON.stringify(this.users));
+        fs.writeFileSync(this.users_filename, JSON.stringify(this.users));
     }
 
     updateConfigFile() {
