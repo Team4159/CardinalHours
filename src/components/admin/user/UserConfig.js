@@ -13,6 +13,7 @@ import log from 'electron-log';
 
 import SessionsInput from './SessionsInput';
 
+import UserStore from '../../../state/UserStore';
 import DB from '../../../state/DB';
 
 export default class UserConfig extends Component {
@@ -41,6 +42,31 @@ export default class UserConfig extends Component {
 
         this.handleSetPane = this.handleSetPane.bind(this);
 
+        UserStore.onRemoveUser(user => {
+            if (user.name === this.state.original_name) {
+                this.setState({
+                    names: DB.getUserNames(),
+                    original_name: null,
+
+                    name: null,
+                    id: null,
+                    sessions: null,
+                });
+            }
+        });
+
+        UserStore.onUpdateUser(user => {
+            if (user.name === this.state.original_name) {
+                this.setState({
+                    names: DB.getUserNames(),
+                    original_name: user.name,
+
+                    name: user.name,
+                    id: user.id,
+                    sessions: user.sessions,
+                });
+            }
+        });
     }
 
     handleChange(event) {
@@ -70,30 +96,16 @@ export default class UserConfig extends Component {
     }
 
     handleSaveUser() {
-        DB.setUser(
-            this.state.original_name,
+        UserStore.updateUser(
+            DB.query({name: this.state.original_name}),
             this.state.name,
             this.state.id,
             this.state.sessions
         );
-
-        this.setState({
-            names: DB.getUserNames(),
-            original_name: this.state.name,
-        });
     }
 
     handleDropUser() {
-        DB.dropUser(this.state.original_name);
-
-        this.setState( {
-            names: DB.getUserNames(),
-            original_name: null,
-
-            name: null,
-            id: null,
-            sessions: null,
-        });
+        UserStore.removeUser({name: this.state.original_name});
     }
 
     handleAddSession(session) {

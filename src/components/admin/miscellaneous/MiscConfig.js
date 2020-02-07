@@ -16,6 +16,7 @@ export default class MiscConfig extends Component {
         super(props);
 
         this.state = {
+            sign_ups: DB.isSignUpsEnabled(),
             old_password: '',
             new_password: '',
             confirm_password: '',
@@ -26,13 +27,24 @@ export default class MiscConfig extends Component {
         this.togglePasswordInput = this.togglePasswordInput.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handlePasswordSubmit = this.handlePasswordSubmit.bind(this);
+
+        ConfigStore.onUpdatePassword(_ => {
+            this.setState({
+                old_password: '',
+                new_password: '',
+                confirm_password: ''
+            });
+        });
+
+        ConfigStore.onToggleSignUps(enabled => {
+            this.setState({
+                sign_ups: enabled,
+            });
+        });
     }
 
     toggleSignUps() {
-        DB.setAndUpdateConfigFile(!DB.config['sign_ups'], 'sign_ups');
-
-        ConfigStore.refreshMainContainer();
-        this.forceUpdate();
+        ConfigStore.toggleSignUps();
     }
 
     togglePasswordInput() {
@@ -49,13 +61,7 @@ export default class MiscConfig extends Component {
 
     handlePasswordSubmit() {
         if (this.state.new_password === this.state.confirm_password && (DB.isPasswordNotSet() || DB.verifyPassword(this.state.old_password))) {
-            DB.setPassword(this.state.new_password);
-
-            this.setState({
-                old_password: '',
-                new_password: '',
-                confirm_password: ''
-            });
+            ConfigStore.updatePassword(this.state.new_password);
         }
     }
 
@@ -65,9 +71,9 @@ export default class MiscConfig extends Component {
                 <Button
                     outline
                     onClick={this.toggleSignUps}
-                    color={DB.config.sign_ups ? 'primary' : 'secondary'}
+                    color={this.state.sign_ups ? 'primary' : 'secondary'}
                 >Sign Ups {
-                    DB.config.sign_ups ?
+                    this.state.sign_ups ?
                         <Badge color='success' pill>Enabled</Badge>
 
                         : <Badge color='dark' pill>Disabled</Badge>

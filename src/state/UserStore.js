@@ -21,6 +21,36 @@ class UserStore {
         this.event_emitter.on('addUser', handler);
     }
 
+    removeUser(user) {
+        const res = DB.removeUser(user);
+
+        if (res) {
+            this.event_emitter.emit('removeUser', DB.query(user));
+
+            this.signOutUser(user);
+        }
+
+        return res;
+    }
+
+    onRemoveUser(handler) {
+        this.event_emitter.on('removeUser', handler);
+    }
+
+    updateUser(user, name, id, sessions) {
+        const res = DB.updateUser(user, name, id, sessions);
+
+        if (res) {
+            this.event_emitter.emit('updateUser', DB.query(user));
+        }
+
+        return res;
+    }
+
+    onUpdateUser(handler) {
+        this.event_emitter.on('updateUser');
+    }
+
     signInUser(user) {
         this.event_emitter.emit('signInUser', DB.query(user));
     }

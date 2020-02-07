@@ -35,14 +35,12 @@ export default class RangeInput extends Component {
 
     handleSubmit() {
         if (this.isDatesValid()) {
-            DB.setCounter(
+            ConfigStore.updateRangeCounter(
                 this.props.counter.type,
                 this.state.counter_name,
                 this.state.counter_start,
                 this.state.counter_end,
             );
-
-            ConfigStore.refreshCounterConfigRadio();
         }
     }
 
