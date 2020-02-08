@@ -7,7 +7,8 @@ import hash from 'password-hash';
 import moment from 'moment';
 import GoogleSpreadsheet from 'google-spreadsheet';
 import { remote } from 'electron';
-import UserStore from "./UserStore";
+
+import UserStore from './UserStore';
 
 class DB {
     constructor() {
@@ -33,6 +34,10 @@ class DB {
 
         fs.watchFile(this.users_filename, () => {
             this.users = JSON.parse(fs.readFileSync(this.users_filename));
+        });
+
+        fs.watchFile(this.config_filename, () => {
+            this.config = JSON.parse(fs.readFileSync(this.config_filename));
         });
 
         this.sheet = new GoogleSpreadsheet(this.config.sheets.sheet_id);
@@ -90,7 +95,7 @@ class DB {
 
     getCells(cb) {
         this.checkAuth(err => {
-            if (err) cb(err);
+            if (err) return cb(err);
             this.worksheet.getCells({
                 'return-empty': true
             }, (err, cells) => {
@@ -124,7 +129,7 @@ class DB {
                 if (row[getColumn('FIRST')].value === '' && row[getColumn('Last')].value === '') {
                     break;
                 }
-                let name = `${ row[getColumn('FIRST')].value } ${ row[getColumn('Last')].value }`;
+                let name = `${ row[getColumn('FIRST')].value.trim() } ${ row[getColumn('Last')].value.trim() }`;
                 let user = this.query({ name });
                 if (!user) {
                     log.error('Unable to find ' + name + ' on Google Sheets');
@@ -156,7 +161,7 @@ class DB {
         log.info('Adding session for ' + user.name);
         this.query(user).sessions.push(session);
 
-        if (!this.isDev) {
+        if (this.isDev) {
             this.syncSheets();
         }
 
