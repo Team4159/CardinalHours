@@ -21,7 +21,7 @@ export default class CounterConfig extends Component {
 
         this.setSelectedCounter = this.setSelectedCounter.bind(this);
 
-        ConfigStore.onRefreshCounterConfigRadio(_ => {
+        ConfigStore.onUpdateCounter(_ => {
             this.forceUpdate();
         })
     }

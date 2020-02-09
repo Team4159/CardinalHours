@@ -17,7 +17,7 @@ export default class MainContainer extends Component {
     constructor(props) {
         super(props);
 
-        ConfigStore.onRefreshMainContainer(_ =>
+        ConfigStore.onToggleSignUps(_ =>
             this.forceUpdate(),
         );
     }

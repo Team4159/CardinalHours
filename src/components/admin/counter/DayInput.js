@@ -42,13 +42,11 @@ export default class DayInput extends Component {
     }
 
     handleSubmit() {
-        DB.setCounter(
+        ConfigStore.updateDayCounter(
             this.props.counter.type,
             this.state.counter_name,
             this.state.counter_day
         );
-
-        ConfigStore.refreshCounterConfigRadio();
     }
 
     render() {

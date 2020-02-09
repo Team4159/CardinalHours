@@ -1,24 +1,54 @@
 import MicroEmitter from 'micro-emitter';
+import DB from "./DB";
 
 class ConfigStore {
     constructor() {
         this.event_emitter = new MicroEmitter();
     }
 
-    onRefreshMainContainer(handler) {
-        this.event_emitter.on('refreshMainContainer', handler);
+    updateDayCounter(type, name, day) {
+        DB.setCounter(
+            type,
+            name,
+            day
+        );
+
+        this.event_emitter.emit('updateCounter', type, name);
     }
 
-    refreshMainContainer() {
-        this.event_emitter.emit('refreshMainContainer');
+    updateRangeCounter(type, name, start, end) {
+        DB.setCounter(
+            type,
+            name,
+            start,
+            day
+        );
+
+        this.event_emitter.emit('updateCounter');
     }
 
-    onRefreshCounterConfigRadio(handler) {
-        this.event_emitter.on('refreshCounterConfigRadio', handler);
+    onUpdateCounter(handler) {
+        this.event_emitter.on('updateCounter', handler);
     }
 
-    refreshCounterConfigRadio() {
-        this.event_emitter.emit('refreshCounterConfigRadio');
+    toggleSignUps() {
+        DB.toggleSignUps();
+
+        this.event_emitter.emit('toggleSignUps', DB.isSignUpsEnabled());
+    }
+
+    onToggleSignUps(handler) {
+        this.event_emitter.on('toggleSignUps', handler);
+    }
+
+    updatePassword(password) {
+        DB.setPassword(password);
+
+        this.event_emitter.emit('updatePassword');
+    }
+
+    onUpdatePassword(handler) {
+        this.event_emitter.on('updatePassword', handler);
     }
 }
 

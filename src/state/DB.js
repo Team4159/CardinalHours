@@ -318,25 +318,45 @@ class DB {
      * ID to NEW_ID
      * NAME to NEW_SESSIONS
      */
-    setUser(original_name, new_name, new_id, new_sessions) {
-        const idx = this.users.findIndex(user => user.name === original_name);
+    setUser(user, new_name, new_id, new_sessions) {
+        log.info('Updating user: ' + user.name);
+
+        const idx = this.users.findIndex(user_ => user_.name === user.name);
 
         this.users[idx].name = new_name;
         this.users[idx].id = new_id;
         this.users[idx].sessions = new_sessions;
+
+        this.updateUsersFile();
     }
 
 
     /*
      * finds and drops user with name NAME
      */
-    dropUser(name) {
-        const drop = this.query({name: name});
-
-        UserStore.signOutUser(drop);
+    removeUser(user) {
+        log.info('Removing user: ' + user.name);
+        const drop = this.query(user);
 
         this.users = this.users.filter(user => user.name !== drop.name);
+
+        this.users.push({
+            name: user.name,
+            id: user.id,
+            sessions: []
+        });
+
         this.updateUsersFile();
+
+        return true;
+    }
+
+    toggleSignUps() {
+        this.config.sign_ups = !this.config.sign_ups;
+    }
+
+    isSignUpsEnabled() {
+        return this.config.sign_ups;
     }
 }
 
