@@ -139,7 +139,10 @@ class DB {
 
     addUser(user) {
         log.info('Adding user: ' + user.name);
-        if (this.query({id: user.id})) return false;
+        if (this.query({id: user.id}) || user.id === "" || user.name === "") return false;
+        //an existing username probably does something bad, idk I'm just a noob
+        //the system freaks out on empty username, so just say no
+        //same with passwords
 
         this.users.push({
             name: user.name,
